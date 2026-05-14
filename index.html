@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GorIlliaPanel</title>
+<style>
+:root{
+--bg:#0f1115;
+--card:#1a1f27;
+--border:#2c3440;
+--text:#f5f7fa;
+--muted:#9aa4b2;
+--green:#34d399;
+--gold:#fbbf24;
+--red:#f87171;
+--blue:#60a5fa;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+header{padding:20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(15,17,21,.95);backdrop-filter:blur(10px);z-index:100}
+h1{margin:0;font-size:24px}
+.sub{color:var(--muted);margin-top:4px;font-size:14px}
+.toolbar{margin-top:16px;display:flex;gap:12px}
+.search{flex:1}
+.search input{width:100%;background:#11161d;border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:12px;font-size:14px}
+main{padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;transition:.15s ease;cursor:pointer}
+.card:hover{transform:translateY(-2px);border-color:#475569}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.name{font-size:20px;font-weight:700}
+.client-id{color:var(--muted);font-size:13px;margin-top:2px}
+.status{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.status.green{background:rgba(52,211,153,.15);color:var(--green)}
+.status.gold{background:rgba(251,191,36,.15);color:var(--gold)}
+.status.red{background:rgba(248,113,113,.15);color:var(--red)}
+.plan{margin-top:18px;font-size:15px;font-weight:600}
+.progress{margin-top:6px;color:var(--muted);font-size:14px}
+.stats{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:#11161d;border-radius:12px;padding:12px}
+.stat-label{color:var(--muted);font-size:12px}
+.stat-value{margin-top:4px;font-size:16px;font-weight:700}
+.alerts{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.alert{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);color:#fca5a5;border-radius:10px;padding:10px 12px;font-size:13px}
+.loading,.empty{color:var(--muted);padding:30px;text-align:center}
+.footer{margin-top:16px;display:flex;justify-content:space-between;align-items:center}
+.link-btn{text-decoration:none;color:var(--blue);font-size:14px}
+.refresh{background:#11161d;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
+.refresh:hover{border-color:#475569}
+</style>
+</head>
+<body>
+<header>
+<h1>🦍 GorIlliaPanel</h1>
+<div class="sub">Dashboard trenera — MonkeyPanel MVP</div>
+<div class="toolbar">
+<div class="search">
+<input id="searchInput" type="text" placeholder="Szukaj podopiecznego..." />
+</div>
+<button class="refresh" id="refreshBtn">Odśwież</button>
+</div>
+</header>
+<main>
+<div id="loading" class="loading">Ładowanie dashboardu...</div>
+<div id="clientsGrid" class="grid"></div>
+</main>
+<script>
+const API_URL='PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE';
+let allClients=[];
+async function loadDashboard(){const loading=document.getElementById('loading');const grid=document.getElementById('clientsGrid');loading.style.display='block';grid.innerHTML='';try{const res=await fetch(API_URL+'?action=getClientsDashboard');const data=await res.json();if(!data.ok){throw new Error(data.error||'Unknown error')}allClients=data.clients||[];renderClients(allClients)}catch(err){grid.innerHTML=`<div class="empty">Błąd ładowania dashboardu<br><br>${err}</div>`}finally{loading.style.display='none'}}
+function renderClients(clients){const grid=document.getElementById('clientsGrid');if(!clients.length){grid.innerHTML='<div class="empty">Brak klientów</div>';return}grid.innerHTML=clients.map(renderClientCard).join('')}
+function renderClientCard(client){const alerts=client.alerts||[];let statusClass='green';if(alerts.length>=2){statusClass='red'}else if(alerts.length===1){statusClass='gold'}return `<div class="card"><div class="card-top"><div><div class="name">${client.client_name||'Unknown'}</div><div class="client-id">${client.client_id||''}</div></div><div class="status ${statusClass}">${client.status||'active'}</div></div><div class="plan">${client.active_plan_name||'No active plan'}</div><div class="progress">Week ${client.current_week||0} / Workout ${client.current_workout||0}</div><div class="stats"><div class="stat"><div class="stat-label">Last training</div><div class="stat-value">${client.last_training_date||'-'}</div></div><div class="stat"><div class="stat-label">Completed</div><div class="stat-value">${client.completed_workouts||0}</div></div></div>${alerts.length?`<div class="alerts">${alerts.map(renderAlert).join('')}</div>`:''}<div class="footer"><div class="client-id">${client.last_activity||''}</div>${client.spreadsheet_url?`<a class="link-btn" href="${client.spreadsheet_url}" target="_blank">Open Sheet</a>`:''}</div></div>`}
+function renderAlert(alert){const map={inactive_7d:'⚠ Brak treningu 7 dni',missing_rpe:'⚠ Brak RPE',skipped_exercises:'⚠ Pominięte ćwiczenia'};return `<div class="alert">${map[alert]||alert}</div>`}
+document.getElementById('refreshBtn').addEventListener('click',loadDashboard);
+document.getElementById('searchInput').addEventListener('input',e=>{const q=e.target.value.toLowerCase();const filtered=allClients.filter(client=>(client.client_name||'').toLowerCase().includes(q)||(client.client_id||'').toLowerCase().includes(q));renderClients(filtered)});
+loadDashboard();
+</script>
+</body>
+</html>
