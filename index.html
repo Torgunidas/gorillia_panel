@@ -66,7 +66,7 @@ main{padding:20px}
 <div id="clientsGrid" class="grid"></div>
 </main>
 <script>
-const API_URL='PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE';
+const API_URL='https://script.google.com/macros/s/AKfycbx6AQ6v382RXmr6YdisKN5YgKSyTZ35pOE-tR0jhh827Dxvp3EfsT1fZnm31Hu98hY/exec';
 let allClients=[];
 async function loadDashboard(){const loading=document.getElementById('loading');const grid=document.getElementById('clientsGrid');loading.style.display='block';grid.innerHTML='';try{const res=await fetch(API_URL+'?action=getClientsDashboard');const data=await res.json();if(!data.ok){throw new Error(data.error||'Unknown error')}allClients=data.clients||[];renderClients(allClients)}catch(err){grid.innerHTML=`<div class="empty">Błąd ładowania dashboardu<br><br>${err}</div>`}finally{loading.style.display='none'}}
 function renderClients(clients){const grid=document.getElementById('clientsGrid');if(!clients.length){grid.innerHTML='<div class="empty">Brak klientów</div>';return}grid.innerHTML=clients.map(renderClientCard).join('')}
