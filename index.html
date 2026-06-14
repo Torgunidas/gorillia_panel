@@ -3,452 +3,1480 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MonkeyPanel v0.6 Supabase</title>
+<title>GorIlliaPanel v0.35 Plan Builder</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080808;--card:#141414;--card2:#202020;--line:#303030;--text:#f4f4f5;--muted:#a1a1aa;--green:#14532d;--green2:#22c55e;--gold:#422006;--red:#450a0a;--blue:#111827;--accent:#f4f4f5;--accentText:#09090b}
-*{box-sizing:border-box}html{overflow-y:scroll;scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{width:min(560px,100%);margin:0 auto;min-height:100dvh;padding:12px 12px 90px}.top{position:sticky;top:0;z-index:20;margin:-12px -12px 12px;padding:14px 12px 10px;background:rgba(8,8,8,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:900}h1{font-size:28px;line-height:1.05;margin:3px 0 2px}h2{font-size:22px;margin:0 0 8px}.subtitle{color:var(--muted);font-size:15px}.api{font-size:13px;margin-top:5px}.api.ok{color:#86efac}.api.err{color:#fca5a5}.api.loading{color:#fde68a}.progress{height:9px;background:#262626;border-radius:99px;margin-top:14px;overflow:hidden}.progress div{height:100%;background:#f4f4f5;width:0%;transition:.25s}.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:10px 0 12px}.tab{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:18px;padding:9px 4px;font-size:11px}.tab.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:16px;box-shadow:0 12px 30px rgba(0,0,0,.25)}.btn{border:0;border-radius:18px;padding:14px;font-weight:900;background:var(--accent);color:var(--accentText)}.btn.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}.btn.good{background:var(--green);color:white}.btn.danger{background:var(--red);color:#fecaca;border:1px solid #991b1b}.btn.full{width:100%}.btn.tiny{padding:5px 10px;border-radius:999px;font-size:12px}.btn:disabled{opacity:.38;cursor:not-allowed}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.kpi{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px;text-align:center}.kpi strong{display:block;font-size:24px}.legend{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}.legend span{font-size:12px;color:#ddd;border:1px solid var(--line);border-radius:999px;padding:5px 8px}.calendar{display:grid;gap:12px}.weekCard{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:12px}.weekHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.days{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.dayBtn{min-height:112px;text-align:left;border-radius:20px;border:1px solid var(--line);padding:10px;color:var(--text);background:#111}.dayBtn .date{font-size:13px;color:#ddd;line-height:1.15}.dayBtn .name{font-size:19px;font-weight:950;line-height:1.05;margin-top:5px}.dayBtn .bar{height:8px;border-radius:999px;background:rgba(255,255,255,.18);margin-top:8px;overflow:hidden}.dayBtn .bar div{height:100%;border-radius:999px;background:white;width:0%}.status-done{background:#052e16;border-color:#166534}.status-due{background:var(--gold);border-color:#92400e}.status-local{background:#172554;border-color:#2563eb}.status-future{background:var(--blue);border-color:#374151}.exercise-title{font-size:30px;line-height:1.04;margin:6px 0 12px;font-weight:950}.exerciseTop{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}.pill{display:inline-flex;align-items:center;border-radius:999px;background:var(--card2);padding:5px 10px;color:var(--muted);font-size:12px}.exerciseProgress{display:flex;gap:5px;margin:12px 0 14px;overflow:hidden}.dot{height:8px;flex:1;border-radius:99px;background:#303030}.dot.done{background:var(--green2)}.dot.current{background:#f4f4f5}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#090909;border-radius:18px;padding:10px;text-align:center}.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}.note{background:var(--card2);border-radius:18px;padding:12px;color:#e5e5e5;font-size:14px;line-height:1.35;margin:12px 0}.embed{position:relative;width:100%;aspect-ratio:16/9;background:#000;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:10px 0 12px}.embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.set{border:1px solid var(--line);background:#090909;border-radius:24px;padding:12px;margin:10px 0}.set.done{border-color:#166534;background:rgba(20,83,45,.28)}.doneCompact{display:none;align-items:center;justify-content:space-between;gap:8px}.set.done .doneCompact{display:flex}.set.done .openSet{display:none}.set-head{display:flex;justify-content:space-between;gap:8px;font-weight:900;margin-bottom:8px}.inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}label.small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}input,textarea,select{width:100%;background:var(--card2);color:var(--text);border:1px solid #3a3a3a;border-radius:16px;outline:none}input,select{font-size:18px;font-weight:850;text-align:center;padding:10px 6px}textarea{min-height:68px;padding:12px;resize:vertical}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.measure-row{display:flex;align-items:center;gap:12px;background:#090909;border:1px solid var(--line);border-radius:24px;padding:12px;margin-bottom:10px}.measure-row span{width:86px;font-weight:900}.measure-row input{text-align:right;font-size:24px;padding-right:14px}.historyTable{width:100%;overflow:auto}.historyTable table{min-width:620px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid #333;padding:9px;text-align:left;vertical-align:top}.list{display:grid;gap:10px}.item,.doneItem,.summaryBlock{background:#090909;border:1px solid var(--line);border-radius:22px;padding:12px}.item.activePlan{border-color:#166534;background:#07130b}.planButton{width:100%;text-align:left;color:var(--text)}.summaryLine{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #272727;padding-top:6px;margin-top:6px}.empty{border:1px dashed #444;border-radius:24px;padding:32px;text-align:center;color:var(--muted)}.toast{position:fixed;left:14px;right:14px;bottom:18px;z-index:60;max-width:540px;margin:auto;background:#f4f4f5;color:#09090b;border-radius:22px;padding:16px;font-weight:900;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.45)}.finishScreen{background:linear-gradient(180deg,#073b1b,#0b0b0b 48%);border:1px solid #166534;border-radius:34px;padding:22px}.finishHero{text-align:center;padding:18px 6px 12px}.finishHero h2{font-size:36px;line-height:1.05;margin:0 0 8px}.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:flex-end;padding:12px}.modal .panel{max-width:560px;width:100%;max-height:86dvh;overflow:auto;margin:0 auto;background:#111;border:1px solid var(--line);border-radius:28px;padding:16px}.hidden{display:none!important}.exerciseNav{display:grid;grid-template-columns:1fr 62px 62px;gap:8px;margin-bottom:12px}.exerciseNav .navMini{font-size:26px;line-height:1;padding:12px 0}.back{margin-bottom:10px}.metaGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.metaBox{background:#090909;border:1px solid var(--line);border-radius:18px;padding:10px}.metaBox small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}.metaBox strong{font-size:14px;word-break:break-word}.clientBtn{width:100%;text-align:left;background:#0f0f0f;color:var(--text);border:1px solid var(--line);border-radius:24px;padding:14px}.clientBtn strong{display:block;font-size:20px}.clientBtn small{display:block;color:var(--muted);margin-top:4px}.weekPick{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:999px;padding:8px 10px;font-weight:900}.weekPick.active{background:var(--accent);color:var(--accentText)}.weekPicker{display:flex;gap:6px;overflow:auto;margin:0 0 12px;padding-bottom:4px}.rxLine{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.rxPill{border:1px solid #3a3a3a;background:#111;border-radius:999px;padding:4px 8px;font-size:12px;color:#ddd}.rxPill.gold{border-color:#92400e;color:#fde68a}.sessionNote{margin-top:12px}@media(max-width:430px){.days{grid-template-columns:repeat(2,1fr)}.tabs{grid-template-columns:repeat(5,minmax(58px,1fr));overflow:auto}.tab{min-width:58px}.summary{grid-template-columns:1fr}.inputs{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.exerciseNav{grid-template-columns:1fr 52px 52px}}
-.clientBtn{display:block;text-decoration:none}
+:root{--bg:#111318;--panel:#181b21;--panel2:#101217;--line:#2b3038;--text:#f4f6f8;--muted:#9aa3b2;--gold:#d7b05a;--green:#22c55e;--red:#ef4444;--blue:#38bdf8;--warn:#f59e0b;--soft:#20242c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.35}button,input,select,textarea{font:inherit}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}.sidebar{background:#0d0f13;border-right:1px solid var(--line);padding:16px;position:sticky;top:0;height:100vh}.logo{font-size:23px;font-weight:950}.version{font-size:12px;color:var(--muted);margin-top:4px}.nav{display:grid;gap:8px;margin-top:22px}.nav button{border:1px solid var(--line);background:#171a20;color:#fff;border-radius:10px;padding:11px 12px;text-align:left;font-weight:850;cursor:pointer}.nav button.active{background:white;color:black}
+.main{padding:18px;max-width:none}.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}.eyebrow{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em}.title{font-size:28px;font-weight:950;margin-top:1px}.status{font-size:13px;margin-top:6px}.status.ok{color:#86efac}.status.loading{color:#fde68a}.status.err{color:#fecaca}.btn{border:0;background:white;color:black;border-radius:9px;padding:8px 12px;font-weight:900;cursor:pointer;min-height:38px}.btn.secondary{background:#20242b;color:#fff;border:1px solid var(--line)}.btn.good{background:#166534;color:#fff}.btn.danger{background:#451a1a;color:#fecaca;border:1px solid #7f1d1d}.btn:disabled{opacity:.45;cursor:not-allowed}.btnRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs{display:flex;gap:6px;margin:0 0 14px}.tab{border:1px solid #333;background:#1b1f26;color:#fff;border-radius:10px;padding:8px 12px;font-weight:850;cursor:pointer}.tab.active{background:white;color:#000}.section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}.sectionTitle{font-size:18px;font-weight:950;color:var(--gold);margin-bottom:12px}.note{border:1px solid #4b3a17;background:#171307;color:#fde68a;border-radius:12px;padding:10px 12px;margin-bottom:12px;line-height:1.4}.small{color:var(--muted);font-size:13px}.muted{color:var(--muted)}
+input,select,textarea{width:100%;background:#20242b;border:1px solid #363c46;color:#fff;border-radius:9px;padding:8px 10px;outline:none;min-height:38px}textarea{min-height:74px;resize:vertical}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.field label{display:block;color:var(--muted);font-size:12px;font-weight:850;margin-bottom:5px}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}.planCard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;min-height:132px}.planCard:hover{border-color:#555}.planCard.new{display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:950;color:var(--muted)}.pill{display:inline-flex;align-items:center;border:1px solid #333;background:#111;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;color:#ddd;margin:2px}.pill.good{border-color:#166534;color:#86efac}.pill.warn{border-color:#92400e;color:#fde68a}.pill.blue{border-color:#164e63;color:#67e8f9}
+.training{border:1px solid #303030;border-radius:16px;background:#101010;overflow:hidden;margin-bottom:14px}.trainingHead{display:grid;grid-template-columns:190px 1fr auto;gap:8px;align-items:center;background:#121212;padding:12px}.exerciseGrid{display:grid;grid-template-columns:54px 1.15fr .38fr .52fr .52fr .55fr .55fr .8fr .6fr .55fr .38fr;gap:7px;padding:8px 10px;border-top:1px solid #252525;align-items:center}.exerciseGrid.header{font-size:12px;font-weight:900;color:var(--muted);background:#0e0e0e}.exerciseName{font-weight:900}.empty{border:1px dashed #444;border-radius:16px;padding:26px;text-align:center;color:var(--muted)}.addBar{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:12px;border-top:1px solid #252525;background:#0d0d0d}.deleteX{width:30px;height:30px;border-radius:999px;background:#1f1f1f;border:1px solid #333;color:#ef4444;font-weight:950;cursor:pointer}
+.progressTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;margin-bottom:14px}.blockTabs{display:flex;gap:8px;overflow:auto;padding-bottom:6px}.blockTab{white-space:nowrap;border:1px solid #333;background:#1b1b1b;color:#fff;border-radius:999px;padding:9px 12px;font-weight:900;cursor:pointer}.blockTab.active{background:white;color:#000}.blockEditor{display:grid;grid-template-columns:1.4fr 105px 105px minmax(180px,1fr);gap:10px;margin-bottom:14px}.progressMeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.progressExerciseCard{border:1px solid #303030;background:#101010;border-radius:16px;margin-top:14px;overflow:hidden}.progressExerciseHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:#141414;border-bottom:1px solid #2a2a2a;padding:12px}.progressExerciseTitle{font-size:19px;font-weight:950}.weekStrip{display:grid;grid-template-columns:1fr;gap:12px;padding:12px}.weekCard{width:100%;border:1px solid #303030;background:#0b0b0b;border-radius:14px;padding:12px}.weekTitle{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--gold);font-weight:950;margin-bottom:12px}.weekActions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.setHeader,.setRow{display:grid;grid-template-columns:52px minmax(180px,1fr) minmax(120px,.55fr) minmax(120px,.55fr) auto;gap:8px;align-items:center}.setHeader{color:var(--muted);font-size:12px;font-weight:900;padding:0 0 6px}.setRow{margin-bottom:8px}.setRow.statusSet{grid-template-columns:52px minmax(220px,1fr) auto}.setNo{height:42px;border:1px solid #333;border-radius:10px;background:#151515;color:#ddd;display:flex;align-items:center;justify-content:center;font-weight:950}.statusCell{min-height:42px;border:1px solid #4b3a17;background:#151006;color:#fde68a;border-radius:10px;display:flex;align-items:center;padding:0 12px;font-weight:950}.miniBtn{border:1px solid #333;background:#1a1a1a;color:#fff;border-radius:9px;padding:7px 9px;font-size:12px;font-weight:900;cursor:pointer}.miniBtn.good{border-color:#166534;color:#86efac}.miniBtn.danger{border-color:#7f1d1d;color:#fecaca}.setActions{display:flex;gap:5px}.emptyWeek{border:1px dashed #333;border-radius:12px;color:var(--muted);padding:14px;text-align:center;margin-bottom:8px}.resourceRow{display:grid;grid-template-columns:1fr 1.4fr .55fr 1fr auto;gap:8px;align-items:start;margin-bottom:9px}.registryTable{width:100%;border-collapse:collapse}.registryTable th,.registryTable td{border:1px solid #333;padding:8px;text-align:left}.registryTable th{color:var(--gold);background:#1a1a1a}.toast{position:fixed;left:14px;right:14px;bottom:18px;z-index:60;max-width:540px;margin:auto;background:#f4f4f5;color:#09090b;border-radius:18px;padding:14px;font-weight:900;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.weekNotesPanel{border:1px solid #303030;background:#101010;border-radius:16px;padding:12px;margin-bottom:14px}.weekNotesTitle{color:var(--gold);font-weight:950;margin-bottom:10px}.weekNoteRow{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:start;margin-bottom:8px}.weekNoteLabel{height:44px;display:flex;align-items:center;color:#fff;font-weight:950}.weekNoteInput{min-height:44px;height:44px;resize:vertical}
+.builderLayout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}.builderNav{position:sticky;top:18px;border:1px solid var(--line);background:#101217;border-radius:14px;padding:10px}.builderNavTitle{padding:8px 9px 10px;color:var(--muted);font-size:12px;font-weight:950;text-transform:uppercase}.builderStep{width:100%;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:10px;padding:10px 11px;text-align:left;font-weight:950;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center}.builderStep:hover{background:#171a20;color:#fff}.builderStep.active{background:#f4f6f8;color:#09090b;border-color:#f4f6f8}.builderStepNo{color:inherit;opacity:.62;font-size:12px;font-weight:950}.builderPane{min-width:0}.builderPlaceholder{border:1px dashed #424a55;border-radius:14px;background:#12151b;color:var(--muted);padding:28px;text-align:center}.builderPlaceholder strong{display:block;color:#fff;font-size:18px;margin-bottom:6px}
+.athleteLayout{display:grid;grid-template-columns:minmax(230px,280px) minmax(0,1fr);gap:14px;align-items:start}.rosterPanel{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto}.athleteList{display:grid;gap:8px}.athleteCard{border:1px solid #303641;background:#15181e;border-radius:12px;padding:12px;text-align:left;color:#fff;cursor:pointer}.athleteCard.active{border-color:#e5e7eb;background:#20242c}.athleteName{font-size:18px;font-weight:950}.athleteWorkspace{min-width:0}.athleteHero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}.athleteHeroTitle{font-size:24px;font-weight:950}.profileFields{display:grid;grid-template-columns:1.1fr 1fr .8fr 1.4fr;gap:10px;margin-top:12px}.detailHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}.planRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid #303641;background:#15181e;border-radius:12px;padding:10px 12px;margin-bottom:8px}.previewPicker{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;border:1px solid #303641;background:#15181e;border-radius:12px;padding:12px;margin-bottom:12px}.athleteTabs{display:flex;gap:6px;overflow:auto;border-bottom:1px solid var(--line);margin-bottom:12px}.athleteTabs .tab{margin-bottom:-1px;border-bottom-left-radius:0;border-bottom-right-radius:0}.tabPane{min-width:0}.historyGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.75fr);gap:12px}.historyPanel{border:1px solid #303641;background:#15181e;border-radius:12px;padding:12px;min-width:0}.historyTitle{font-size:16px;font-weight:950;color:#fff;margin-bottom:10px}.historyStats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.metricStrip{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-bottom:12px}.metricCard{border:1px solid #303641;background:#15181e;border-radius:12px;padding:10px}.metricLabel{color:var(--muted);font-size:12px;font-weight:850}.metricValue{font-size:22px;font-weight:950;margin-top:2px}.panelNotice{border:1px dashed #424a55;border-radius:12px;padding:22px;text-align:center;color:var(--muted);background:#12151b}.tableWrap{overflow:auto;border:1px solid #292f38;border-radius:12px}.dataTable{width:100%;border-collapse:collapse;min-width:720px}.dataTable.compact{min-width:600px}.dataTable th,.dataTable td{border-bottom:1px solid #29303a;padding:8px 10px;text-align:left;vertical-align:top}.dataTable th{color:var(--muted);background:#11151a;font-size:12px;font-weight:950;position:sticky;top:0;z-index:1}.dataTable tr:last-child td{border-bottom:0}.dataTable tbody tr:hover{background:#1c2129}.numberCell{text-align:right}.sessionDetails summary{cursor:pointer;font-weight:950;color:#fff;white-space:nowrap}.setLogBox{margin-top:8px;max-height:280px;overflow:auto;border:1px solid #292f38;border-radius:10px}.setLogTable{width:100%;min-width:640px;border-collapse:collapse;font-size:12px}.setLogTable th,.setLogTable td{border-bottom:1px solid #252b34;padding:6px 7px;text-align:left}.setLogTable th{color:var(--muted);background:#0f1217}.previewShell{border:1px solid #303641;background:#11151a;border-radius:14px;padding:14px}.weekPicker{display:flex;gap:6px;overflow:auto;padding-bottom:8px;margin-bottom:10px}.weekPick{border:1px solid #333a45;background:#20242b;color:#fff;border-radius:999px;padding:7px 10px;font-weight:900;cursor:pointer;white-space:nowrap}.weekPick.active{background:white;color:#000}.clientWeek{display:grid;gap:10px}.clientWorkout{border:1px solid #303641;background:#15181e;border-radius:12px;padding:12px}.clientExercise{border-top:1px solid #252b34;padding:9px 0}.clientExercise:first-of-type{border-top:0}.rxLine{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.rxPill{border:1px solid #333a45;background:#101217;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;color:#ddd}.rxPill.gold{border-color:#4b3a17;color:#fde68a}.previewPhone{max-width:none;border:1px solid #303641;background:#0f1217;border-radius:16px;padding:12px;margin-top:0}
+@media(max-width:1320px){.historyGrid{grid-template-columns:1fr}.metricStrip{grid-template-columns:repeat(2,minmax(120px,1fr))}}
+@media(max-width:1100px){.app{display:block}.sidebar{height:auto;position:static;border-right:0;border-bottom:1px solid var(--line)}.main{padding:14px}.grid2,.grid4,.progressTop,.blockEditor,.resourceRow,.athleteLayout,.previewPicker,.profileFields,.historyGrid,.builderLayout{grid-template-columns:1fr}.builderNav{position:static;display:flex;gap:6px;overflow:auto}.builderNavTitle{display:none}.builderStep{min-width:145px;white-space:nowrap}.rosterPanel{position:static;max-height:none}.exerciseGrid{grid-template-columns:44px 1fr}.exerciseGrid.header{display:none}.exerciseGrid>*:nth-child(n+3){font-size:13px}.trainingHead,.addBar{grid-template-columns:1fr}.tabs{overflow:auto}.progressExerciseHead{display:block}.progressExerciseHead .btnRow{margin-top:10px}.weekTitle{display:block}.weekActions{justify-content:flex-start;margin-top:8px}.setHeader{display:none}.setRow{grid-template-columns:42px 1fr 1fr}.setRow.statusSet{grid-template-columns:42px 1fr}.setActions{grid-column:2 / -1}.setRow .field:nth-child(4){grid-column:2 / -1}.planRow,.detailHead,.athleteHero{display:block}.planRow .btnRow,.detailHead .btnRow,.athleteHero .btnRow{margin-top:10px}.historyPanel{min-width:0}}
+/* v0.32 compact admin cleanup */
+body{font-size:14px}.app{grid-template-columns:200px minmax(0,1fr)}.sidebar{padding:12px}.logo{font-size:20px;font-weight:850}.version{font-size:11px}.nav{gap:6px;margin-top:16px}.nav button{border-radius:7px;padding:8px 10px;font-size:13px;font-weight:750}.main{padding:14px}.topbar{align-items:center;gap:12px;margin-bottom:12px}.title{font-size:23px;font-weight:850}.eyebrow{font-size:10px;font-weight:800}.status{font-size:12px;margin-top:4px}.btn{border-radius:7px;padding:6px 10px;min-height:32px;font-size:13px;font-weight:750}.btnRow{gap:6px}.section{border-radius:8px;padding:10px;margin-bottom:10px}.sectionTitle{font-size:16px;font-weight:850;margin-bottom:8px}.note{border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px}.small{font-size:12px}input,select,textarea{border-radius:7px;min-height:32px;padding:5px 8px;font-size:13px}textarea{min-height:60px}.grid2,.grid4{gap:8px}.field label{font-size:11px;font-weight:750;margin-bottom:4px}.pill{padding:3px 7px;font-size:11px;font-weight:750}.empty{border-radius:8px;padding:16px;font-size:13px}.builderLayout{grid-template-columns:180px minmax(0,1fr);gap:12px}.builderNav{border-radius:8px;padding:6px}.builderNavTitle{padding:6px 7px 8px;font-size:10px;font-weight:850}.builderStep{border-radius:6px;padding:8px 9px;font-size:13px;font-weight:750}.builderStepNo{font-size:11px}.training{border-radius:8px;margin-bottom:10px;overflow:auto}.trainingHead{grid-template-columns:150px minmax(180px,1fr) auto;gap:6px;padding:8px}.exerciseGrid{grid-template-columns:42px minmax(170px,1.2fr) 62px 72px 80px 86px 78px 138px 88px 78px 30px;min-width:930px;gap:5px;padding:5px 8px}.exerciseGrid.header{font-size:11px;font-weight:800;padding:6px 8px}.exerciseName{font-size:14px;font-weight:800;line-height:1.2}.exerciseGrid input,.exerciseGrid select{min-height:30px;padding:4px 7px}.addBar{grid-template-columns:minmax(220px,360px) auto 1fr;gap:6px;padding:8px;align-items:center}.addExerciseHint{align-self:center}.deleteX{width:28px;height:28px;border-radius:7px}.progressTop{gap:8px;margin-bottom:10px}.blockTab{padding:6px 10px;font-size:13px;font-weight:750}.blockEditor{gap:8px;margin-bottom:10px}.progressExerciseCard{border-radius:8px;margin-top:10px}.progressExerciseHead{padding:9px}.progressExerciseTitle{font-size:16px;font-weight:850}.weekNotesPanel,.weekCard{border-radius:8px;padding:9px}.weekStrip{gap:8px;padding:8px}.weekTitle{margin-bottom:8px}.miniBtn{border-radius:6px;padding:5px 8px;font-size:12px;font-weight:750}.setNo{height:32px;border-radius:7px}.setHeader,.setRow{gap:6px}.setRow{margin-bottom:6px}.resourceRow{gap:6px;margin-bottom:6px}
+@media(max-width:1100px){.app{display:block}.main{padding:12px}.builderLayout{grid-template-columns:1fr}.builderNav{position:static;display:flex;gap:6px;overflow:auto}.builderNavTitle{display:none}.builderStep{min-width:120px;white-space:nowrap}.grid2,.grid4,.progressTop,.blockEditor,.resourceRow,.athleteLayout,.previewPicker,.profileFields,.historyGrid{grid-template-columns:1fr}.trainingHead,.addBar{grid-template-columns:1fr}.exerciseGrid{grid-template-columns:40px 1fr;min-width:0}.exerciseGrid.header{display:none}.exerciseGrid>*:nth-child(n+3){font-size:12px}.setRow{grid-template-columns:40px 1fr 1fr}.setRow.statusSet{grid-template-columns:40px 1fr}}
+/* v0.33 full-width admin shell */
+.app{display:block;min-height:100vh}.globalTopNav{height:48px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 14px;border-bottom:1px solid var(--line);background:#0d0f13;position:sticky;top:0;z-index:30}.brandBlock{display:flex;align-items:baseline;gap:8px;white-space:nowrap}.logo{font-size:17px;font-weight:850}.version{font-size:11px;color:var(--muted);margin:0}.nav{display:flex;gap:6px;margin:0}.nav button{border-radius:6px;padding:6px 10px;text-align:center;font-size:13px;font-weight:750;min-height:30px}.main{padding:14px;max-width:none;width:100%}.topbar{margin-bottom:10px}.title{font-size:22px}.builderLayout{display:block}.builderNav{display:flex;gap:6px;overflow:auto;position:static;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;padding:0 0 8px;margin-bottom:10px}.builderNavTitle,.builderStepNo{display:none}.builderStep{width:auto;border:1px solid var(--line);background:#171a20;border-radius:6px;padding:6px 10px;color:#d4d8df;font-size:13px;min-height:30px}.builderStep.active{background:#f4f6f8;color:#09090b;border-color:#f4f6f8}.builderPane{width:100%}.athleteToolbar{display:grid;grid-template-columns:minmax(220px,320px) minmax(260px,420px) auto;gap:8px;align-items:end;margin-bottom:10px}.athleteProfileHeader{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}.athleteHero{display:block}.historyGrid{display:block}.historyPanel{width:100%;margin-bottom:10px}.sessionRowActive{background:#20242c}.sessionDetailsPanel{margin-top:10px}.dataTable{min-width:860px}.dataTable.sessionsTable{min-width:900px}.setLogBox{max-height:none}.setLogTable{min-width:760px}.tableActionCell{white-space:nowrap}.panelNotice{border-radius:8px;padding:16px}
+@media(max-width:760px){.globalTopNav{height:auto;align-items:flex-start;flex-direction:column;padding:10px 12px}.nav{width:100%;overflow:auto}.athleteToolbar{grid-template-columns:1fr}.brandBlock{width:100%;justify-content:space-between}.main{padding:12px}.dataTable,.dataTable.sessionsTable,.setLogTable{min-width:720px}}
+/* v0.35 friendly notebook skin */
+:root{--bg:#f5f3ec;--panel:#fffdf6;--panel2:#fffaf0;--line:#e6e1d3;--text:#23252b;--muted:#7b7e87;--gold:#8a6d00;--green:#2f7d4f;--red:#c2402a;--blue:#2a6f8f;--warn:#7a5d00;--soft:#fff4c2;--paper:#f5f3ec;--card:#fffdf6;--ink:#23252b;--ink2:#41444c;--pencil:#7b7e87;--line2:#d8d1bd;--mark:#ffe35c;--mark-soft:#fff4c2;--pen:#c2402a;--pen-soft:#faeae5;--ok:#2f7d4f;--ok-soft:#e3f1e8;--blue-soft:#e4eef3;--shadow:0 8px 22px rgba(35,37,43,.06)}
+html{scrollbar-gutter:stable}body{background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14.5px;line-height:1.4}button,input,select,textarea{font:inherit;color:inherit}::selection{background:var(--mark)}
+.logo,.title,.sectionTitle,.progressExerciseTitle,.historyTitle,.metricValue,.btn,.planCard.new{font-family:Archivo,Inter,sans-serif}.globalTopNav{height:50px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(35,37,43,.02);padding:0 18px}.logo{font-size:18px;font-weight:800;letter-spacing:-.01em}.version{color:var(--pencil);font-size:11.5px;font-weight:500}.nav{gap:3px}.nav button{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--ink2);border-radius:8px;padding:7px 10px;font-size:13px;font-weight:600;min-height:34px}.nav button::before{content:"";width:13px;height:13px;border:1.7px solid currentColor;border-radius:4px;opacity:.72}.nav #navAthletes::before{border-radius:50%;box-shadow:6px 0 0 -3px currentColor}.nav #navExercises::before{border-radius:3px;border-style:dashed}.nav button:hover{background:var(--paper);color:var(--ink)}.nav button.active{background:var(--paper);color:var(--ink);font-weight:700}
+.main{padding:22px 24px 56px}.topbar{align-items:flex-end;margin-bottom:18px;gap:18px}.eyebrow{color:var(--pencil);font-size:11px;font-weight:700;letter-spacing:.12em}.title{font-size:27px;font-weight:800;letter-spacing:-.015em}.status{display:inline-flex;align-items:center;gap:7px;color:var(--pencil);font-size:12.5px;font-weight:600}.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pencil)}.status.ok{color:var(--ok)}.status.ok::before{background:var(--ok)}.status.loading{color:#8a6d00}.status.loading::before{background:var(--mark)}.status.err{color:var(--pen)}.status.err::before{background:var(--pen)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ink);background:var(--ink);color:var(--card);border-radius:8px;padding:7px 13px;min-height:36px;font-size:13px;font-weight:700;letter-spacing:.01em;transition:transform .06s ease,background .08s ease,border-color .08s ease}.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.btn.secondary{background:transparent;color:var(--ink);border-color:var(--line2)}.btn.secondary:hover{background:var(--card);border-color:var(--ink2)}.btn.good{background:var(--ok);border-color:var(--ok);color:#fff}.btn.danger{background:transparent;color:var(--pen);border-color:#e3b4a8}.btn.danger:hover{background:var(--pen-soft)}.btnRow{gap:8px}
+input,select,textarea{background:#fff;border:1px solid var(--line2);color:var(--ink);border-radius:8px;min-height:36px;padding:7px 10px;font-size:13.5px;font-variant-numeric:tabular-nums}textarea{min-height:70px;line-height:1.45}input:focus,select:focus,textarea:focus{border-color:var(--ink);box-shadow:0 0 0 3px var(--mark-soft)}input::placeholder,textarea::placeholder{color:#b9bcc4}.field label{color:var(--pencil);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.section,.training,.progressExerciseCard,.weekNotesPanel,.historyPanel,.metricCard,.previewShell,.clientWorkout,.planRow,.previewPicker{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:none}.section{padding:18px;margin-bottom:16px}.sectionTitle{color:var(--ink);font-size:16px;font-weight:700;margin-bottom:12px}.note{background:var(--mark-soft);border:1px solid #ead9a0;color:#6e5600;border-radius:10px;padding:10px 13px;font-size:13px}.small,.muted{color:var(--pencil);font-size:12.5px}.empty,.emptyWeek,.panelNotice{background:transparent;border:1.5px dashed var(--line2);color:var(--pencil);border-radius:12px}.pill{background:var(--card);border:1px solid var(--line2);color:var(--ink2);font-weight:600}.pill.good{background:var(--ok-soft);border-color:#bedccb;color:var(--ok)}.pill.warn{background:var(--mark-soft);border-color:#ead9a0;color:#7a5d00}.pill.blue{background:var(--blue-soft);border-color:#bdd6e2;color:var(--blue)}
+.cards{gap:14px}.planCard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:136px;transition:transform .08s ease,box-shadow .08s ease,border-color .08s ease}.planCard:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--line2)}.planCard.new{background:transparent;border-style:dashed;border-width:1.5px;color:var(--pencil);font-size:16px;font-weight:700}.planCard.new:hover{color:var(--ink);box-shadow:none}
+.builderNav{border-bottom:1px solid var(--line);gap:2px;padding:0;margin-bottom:16px}.builderStep,.tab{position:relative;border:0;background:transparent;color:var(--pencil);border-radius:0;padding:9px 14px 11px;min-height:36px;font-weight:600}.builderStep:hover,.tab:hover{background:transparent;color:var(--ink)}.builderStep.active,.tab.active{background:transparent;color:var(--ink);font-weight:700}.builderStep.active::after,.tab.active::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:3px;background:var(--ink);border-radius:3px 3px 0 0}.athleteTabs{border-bottom-color:var(--line);gap:2px}
+.training{overflow:auto;margin-bottom:14px}.trainingHead{background:var(--paper);border-bottom:1px solid var(--line);padding:11px 13px}.trainingHead input{background:var(--card)}.exerciseGrid{border-top:1px solid var(--line);padding:8px 12px;gap:7px}.exerciseGrid.header{background:var(--card);color:var(--pencil);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}.exerciseGrid:not(.header):hover{background:#fffbe9}.exerciseName{font-weight:700;line-height:1.28}.exerciseGrid input,.exerciseGrid select{min-height:32px}.addBar{background:var(--paper);border-top:1px solid var(--line);padding:11px 13px}.deleteX{background:transparent;border:1px solid transparent;color:var(--pencil);border-radius:7px}.deleteX:hover{background:var(--pen-soft);border-color:#e3b4a8;color:var(--pen)}
+.progressTop{margin-bottom:14px}.blockTab{background:var(--card);border:1px solid var(--line2);color:var(--ink2);font-size:13px;font-weight:600;padding:7px 13px}.blockTab.active{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:700}.progressMeta{gap:6px}.blockEditor{gap:10px}.progressExerciseCard{overflow:hidden}.progressExerciseHead{background:var(--paper);border-bottom:1px solid var(--line);padding:13px}.progressExerciseTitle{color:var(--ink);font-size:17px;font-weight:700}.weekStrip{background:var(--card);padding:12px;gap:10px}.weekCard{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px}.weekTitle{color:var(--ink);font-family:Archivo,Inter,sans-serif;font-size:14px;font-weight:700}.setHeader{color:var(--pencil);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}.setNo{height:34px;background:var(--paper);border:1px solid var(--line);color:var(--ink2);border-radius:8px;font-weight:700}.statusCell{background:var(--mark-soft);border:1px solid #ead9a0;color:#6e5600}.miniBtn{background:var(--card);border:1px solid var(--line2);color:var(--ink2);border-radius:7px;padding:5px 9px;font-size:12px;font-weight:600}.miniBtn:hover{border-color:var(--ink2)}.miniBtn.good{background:var(--ok-soft);border-color:#bedccb;color:var(--ok)}.miniBtn.danger{background:transparent;border-color:#e3b4a8;color:var(--pen)}.miniBtn.danger:hover{background:var(--pen-soft)}
+.weekNotesTitle,.historyTitle{color:var(--ink);font-family:Archivo,Inter,sans-serif;font-size:15px;font-weight:700}.weekNoteLabel{color:var(--ink2);font-weight:700}.registryTable th,.registryTable td{border:1px solid var(--line);background:transparent}.registryTable th{background:var(--paper);color:var(--pencil);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.tableWrap{background:var(--card);border:1px solid var(--line);border-radius:11px}.dataTable th,.dataTable td,.setLogTable th,.setLogTable td{border-bottom:1px solid var(--line)}.dataTable th,.setLogTable th{background:var(--paper);color:var(--pencil);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.dataTable tbody tr:hover{background:#fffbe9}.sessionRowActive{background:#fff4c2}.setLogBox{border:1px solid var(--line);background:#fff;border-radius:9px}
+.athleteCard,.athleteHero{background:var(--card);border-color:var(--line);color:var(--ink)}.athleteCard.active{background:#fffbe9;border-color:var(--ink)}.athleteName,.athleteHeroTitle{color:var(--ink);font-family:Archivo,Inter,sans-serif;font-weight:700}.metricLabel{color:var(--pencil);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.metricValue{color:var(--ink);font-weight:800}.previewShell{padding:16px}.previewPhone{background:#15171c;color:#eef0f4;border:6px solid #23252b;border-radius:20px;box-shadow:0 16px 38px rgba(35,37,43,.18)}.previewPhone .small,.clientExercise .small{color:#8d93a1}.clientWorkout{background:#1a1d23;border-color:#2c2f37;color:#eef0f4}.clientExercise{border-top-color:#262932}.rxPill{background:#14161b;border-color:#343845;color:#cdd2dc}.rxPill.gold{border-color:#4b3f17;color:#fbe9a6}.weekPick{background:var(--card);border:1px solid var(--line2);color:var(--ink2);font-weight:600}.weekPick.active{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.toast{left:50%;right:auto;transform:translateX(-50%);background:var(--ink);color:var(--card);border-radius:12px;padding:11px 18px;font-weight:600;box-shadow:0 14px 34px rgba(35,37,43,.24)}button:focus-visible,.btn:focus-visible,.miniBtn:focus-visible,.builderStep:focus-visible,.tab:focus-visible{outline:3px solid var(--mark-soft);outline-offset:2px}
+@media(max-width:760px){.globalTopNav{padding:10px 12px}.main{padding:14px 12px 42px}.topbar{align-items:flex-start}.title{font-size:23px}.section{padding:14px}.nav{gap:2px}.nav button{white-space:nowrap}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="top">
-    <div class="eyebrow">MonkeyPanel v0.6 · Supabase</div>
-    <h1 id="headerTitle">Postęp planu</h1>
-    <div class="subtitle" id="headerSub">Ładowanie danych…</div>
-    <div id="apiStatus" class="api loading">Ładowanie Supabase…</div>
-    <div class="progress"><div id="progressBar"></div></div>
+  <header class="globalTopNav">
+    <div class="brandBlock">
+      <div class="logo">GorIlliaPanel</div>
+      <div class="version">v0.35 · friendly skin</div>
+    </div>
+    <nav class="nav">
+      <button id="navPlans" class="active" onclick="showPlans()">Plany</button>
+      <button id="navAthletes" onclick="showAthletes()">Podopieczni</button>
+      <button id="navExercises" onclick="showExercises()">Rejestr ćwiczeń</button>
+    </nav>
   </header>
-  <nav class="tabs hidden" id="tabs">
-    <button class="tab active" data-view="train" onclick="setView('train')">🏋️<br>Trening</button>
-    <button class="tab" data-view="plan" onclick="setView('plan')">📋<br>Plan</button>
-    <button class="tab" data-view="measure" onclick="setView('measure')">📏<br>Pomiary</button>
-    <button class="tab" data-view="history" onclick="setView('history')">✅<br>Log</button>
-    <button class="tab" data-view="client" onclick="setView('client')">👤<br>Profil</button>
-  </nav>
-  <main id="view"><section class="card"><div class="empty">Ładowanie…</div></section></main>
+  <main class="main" id="main"></main>
 </div>
-<div id="toast" class="toast hidden"></div>
+
 <script>
-function bootError(message){
-  const status=document.getElementById("apiStatus");
-  const view=document.getElementById("view");
-  if(status){status.textContent=message;status.className="api err"}
-  if(view)view.innerHTML=`<section class="card"><div class="empty">${message}</div></section>`;
-}
-if(!window.supabase||!window.supabase.createClient){
-  bootError("Nie udało się załadować biblioteki Supabase. Upewnij się, że na GitHub trafił źródłowy HTML, a nie strona zapisana z przeglądarki.");
-  throw new Error("Supabase library not loaded");
-}
-const SUPABASE_URL="https://matuflemwleglsrzrlkp.supabase.co";
-const SUPABASE_KEY="sb_publishable_D1z2s-S-GrnWH9u9D8P1nA_H3T9W7hF";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const URL_PARAMS=new URLSearchParams(location.search);
-const INITIAL_CLIENT=(URL_PARAMS.get("client")||URL_PARAMS.get("clientId")||"").trim().toLowerCase();
-const WORKOUT_OFFSETS=[0,2,4,5,7,9];
-const MEASUREMENTS=[
-  ["waga","Waga","kg"],["udo","Udo","cm"],["dupa","Dupa","cm"],["brzuch","Brzuch","cm"],
-  ["klatka","Klatka","cm"],["biceps","Biceps","cm"],["szyja","Szyja","cm"]
-];
-const app={
-  athletes:[],athlete:null,plan:null,links:[],trainings:[],trainingExercises:[],blocks:[],
-  progressionExercises:[],progressionSets:[],weekNotes:[],sessions:[],setLogs:[],measurements:[],
-  sourcePlanKey:null,view:"train",mode:"calendar",activeSessionId:null,exerciseIndex:0,previewWeek:1,
-  draft:{logs:{},skips:{},sessionNotes:{},measurements:{},modeOverrides:{}},
-  status:"Ładowanie Supabase…",statusKind:"loading"
+const SUPABASE_URL = "https://matuflemwleglsrzrlkp.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D1z2s-S-GrnWH9u9D8P1nA_H3T9W7hF";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* =========================
+   STATE
+========================= */
+const STATE = {
+  screen:"plans",
+  tab:"structure",
+  plans:[],
+  exercises:[],
+  athletes:[],
+  athletePlanLinks:[],
+  selectedAthleteId:null,
+  athleteTab:"profile",
+  athletePreview:null,
+  selectedWorkoutSessionId:null,
+  previewWeek:1,
+  currentPlan:null,
+  assignedAthletes:[],
+  trainings:[],
+  trainingExercises:[],
+  blocks:[],
+  activeBlockId:null,
+  progressionExercises:[],
+  progressionSets:[],
+  weekNotes:[],
+  resources:[],
+  dirty:false,
+  saving:false,
+  statusText:"Ładowanie Supabase...",
+  statusKind:"loading",
+  lastError:""
 };
-function $(id){return document.getElementById(id)}
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
-function todayISO(){return new Date().toISOString().slice(0,10)}
-function addDays(iso,days){const d=new Date(`${iso}T00:00:00`);d.setDate(d.getDate()+Number(days||0));return d.toISOString().slice(0,10)}
-function dateLabel(iso){if(!iso)return"-";return String(iso).slice(5,10).replace("-",".")}
-function nullableNumber(v){const text=String(v??"").trim().replace(",",".");return /^-?\d+(?:\.\d+)?$/.test(text)?Number(text):null}
-function money(v){if(v===null||v===undefined||v==="")return"";return Number(v).toLocaleString("pl-PL",{maximumFractionDigits:2})}
-function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ł/g,"l").trim()}
-function setStatus(text,kind="loading"){app.status=text;app.statusKind=kind;const el=$("apiStatus");if(el){el.textContent=text;el.className=`api ${kind}`}}
-function showToast(text){const el=$("toast");el.textContent=text;el.classList.remove("hidden");clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.add("hidden"),2600)}
-function showFatalError(err){
-  const msg=err?.message||String(err||"Błąd aplikacji");
-  console.error(err);
-  setStatus(msg,"err");
-  showToast(msg);
-  const view=$("view");
-  if(view&&!app.plan)view.innerHTML=`<section class="card"><div class="empty">${esc(msg)}</div></section>`;
-}
-window.addEventListener("error",event=>showFatalError(event.error||event.message));
-window.addEventListener("unhandledrejection",event=>showFatalError(event.reason));
-function storageKey(){return app.athlete&&app.plan?`monkey_supabase_v03__${app.athlete.id}__${app.plan.id}`:"monkey_supabase_v03"}
-function loadDraft(){try{app.draft={logs:{},skips:{},sessionNotes:{},measurements:{},modeOverrides:{},...(JSON.parse(localStorage.getItem(storageKey())||"{}"))}}catch{app.draft={logs:{},skips:{},sessionNotes:{},measurements:{},modeOverrides:{}}}}
-function saveDraft(){if(app.athlete&&app.plan)localStorage.setItem(storageKey(),JSON.stringify(app.draft))}
+
+const BUILDER_STEPS = [
+  {id:"overview",label:"Ustawienia"},
+  {id:"structure",label:"Treningi"},
+  {id:"progression",label:"Progresja"}
+];
+
+// Small shared helpers used across render and data flows.
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function norm(s){return String(s??"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ł/g,"l").replace(/[^a-z0-9]+/g," ").trim();}
+function money(v){return v===null||v===undefined?"":String(v).replace(/\.00$/,"");}
+function nullableNumber(v){if(v===""||v===null||v===undefined)return null;const n=Number(String(v).replace(",","."));return Number.isFinite(n)?n:null;}
+function setStatus(text,kind="ok"){STATE.statusText=text;STATE.statusKind=kind;}
+function setError(err){console.error(err);STATE.lastError=err?.message||String(err);setStatus("Błąd", "err");render();}
+function markDirty(){STATE.dirty=true;document.querySelectorAll("[data-dirty]").forEach(el=>el.classList.toggle("warn",true));}
+function showToast(text){const el=document.createElement("div");el.className="toast";el.textContent=text;document.body.appendChild(el);setTimeout(()=>el.remove(),1500);}
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function tempId(){return `tmp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;}
+function slugify(name){return norm(name).replace(/\s+/g,"_")||"plan";}
+function statusHTML(){return `<div class="status ${STATE.statusKind}">${esc(STATE.statusText)}</div>${STATE.lastError?`<div class="note" style="color:#fecaca;border-color:#7f1d1d;background:#190707;margin-top:10px">${esc(STATE.lastError)}</div>`:""}`;}
+
+/* =========================
+   DATA LOADERS
+========================= */
 async function init(){
   try{
-    setStatus("Ładowanie podopiecznych…","loading");
-    await loadAthletes();
-    if(INITIAL_CLIENT&&app.athletes.some(a=>String(a.client_key||"").trim().toLowerCase()===INITIAL_CLIENT))await selectAthlete(INITIAL_CLIENT,false);
-    else{setStatus("Wybierz podopiecznego","ok");render()}
-  }catch(err){console.error(err);setStatus(err.message||"Błąd ładowania","err");render()}
+    await Promise.all([loadPlans(),loadExercises(),loadAthletes()]);
+    await loadAthleteAssignments();
+    setStatus("Połączono z Supabase","ok");
+    render();
+  }catch(err){setError(err);}
+}
+
+async function loadPlans(){
+  const {data,error}=await sb.from("plans").select("id,slug,name,start_date,weeks,status,notes,created_at,imported_at").order("created_at",{ascending:false});
+  if(error)throw error; STATE.plans=data||[];
+}
+async function loadExercises(){
+  const {data,error}=await sb.from("exercises").select("id,name,youtube_url,notes,default_mode,default_category,archived_at,archived_reason").is("archived_at",null).order("name");
+  if(error)throw error; STATE.exercises=data||[];
 }
 async function loadAthletes(){
   const {data,error}=await sb.from("athletes").select("id,client_key,name,status,notes").order("name");
-  if(error)throw error;
-  app.athletes=(data||[]).filter(a=>a.status!=="archived");
+  if(error)throw error; STATE.athletes=data||[];
 }
-async function selectAthlete(clientKey,updateUrl=true){
-  const key=String(clientKey||"").trim().toLowerCase();
-  const athlete=app.athletes.find(a=>String(a.client_key||"").trim().toLowerCase()===key);
-  if(!athlete)throw new Error("Nie znaleziono podopiecznego");
-  app.athlete=athlete;app.view="train";app.mode="calendar";app.activeSessionId=null;app.exerciseIndex=0;
-  if(updateUrl)history.replaceState(null,"",`${location.pathname}?client=${encodeURIComponent(athlete.client_key)}`);
-  setStatus(`Ładowanie planu: ${athlete.name}`,"loading");render();
-  await loadAthletePlan();
+async function loadAthleteAssignments(){
+  const {data,error}=await sb.from("plan_athletes").select("plan_id,athlete_id,assigned_at,plans(id,slug,name,start_date,weeks,status,notes,created_at,published_at),athletes(id,client_key,name,status)").order("assigned_at",{ascending:false});
+  if(error)throw error; STATE.athletePlanLinks=data||[];
 }
-async function loadAthletePlan(){
-  const {data,error}=await sb.from("plan_athletes")
-    .select("plan_id,assigned_at,plans(id,slug,name,start_date,weeks,status,notes,created_at,published_at)")
-    .eq("athlete_id",app.athlete.id)
-    .order("assigned_at",{ascending:false});
-  if(error)throw error;
-  app.links=data||[];
-  const active=app.links.find(l=>l.plans?.status==="active")||app.links[0];
-  if(!active?.plans)throw new Error("Podopieczny nie ma przypisanego planu");
-  app.plan=active.plans;
-  await loadPlanBundle();
-}
-async function loadPlanBundle(){
-  const planId=app.plan.id, athleteId=app.athlete.id;
-  const [tr,blocks,sessions,measurements]=await Promise.all([
-    sb.from("trainings").select("id,plan_id,name,focus,order_index").eq("plan_id",planId).order("order_index"),
-    sb.from("progression_blocks").select("id,plan_id,name,block_index,start_week,end_week,notes").eq("plan_id",planId).order("block_index"),
-    sb.from("workout_sessions").select("id,athlete_id,plan_id,source_plan_key,client_key,session_id,workout_date,performed_date,week_number,workout_id,workout_name,status,completed_exercises,total_exercises,session_note,recorded_at").eq("athlete_id",athleteId).eq("plan_id",planId).order("workout_date",{ascending:false}),
-    sb.from("athlete_measurements").select("id,athlete_id,plan_id,source_plan_key,client_key,measurement_date,week_number,waga,udo,dupa,brzuch,klatka,biceps,szyja,recorded_at").eq("athlete_id",athleteId).eq("plan_id",planId).order("measurement_date",{ascending:false})
-  ]);
-  for(const res of [tr,blocks,sessions,measurements])if(res.error)throw res.error;
-  app.trainings=tr.data||[];app.blocks=blocks.data||[];app.sessions=sessions.data||[];app.measurements=measurements.data||[];
-  app.sourcePlanKey=app.sessions.find(s=>s.source_plan_key)?.source_plan_key||app.plan.slug;
-  const trainingIds=app.trainings.map(t=>t.id);
-  app.trainingExercises=[];
-  if(trainingIds.length){
-    const te=await sb.from("training_exercises").select("id,training_id,exercise_id,exercise_no,order_index,sets_text,reps_text,rest_text,weight,load_text,tempo_text,use_wg,progression_mode,superset_key,mode,notes,exercises(id,name,youtube_url)").in("training_id",trainingIds).order("order_index");
-    if(te.error)throw te.error;
-    app.trainingExercises=te.data||[];
-  }
-  const blockIds=app.blocks.map(b=>b.id);
-  app.progressionExercises=[];app.progressionSets=[];app.weekNotes=[];
-  if(blockIds.length){
-    const [pe,wn]=await Promise.all([
-      sb.from("progression_exercises").select("id,block_id,exercise_id,training_exercise_id,order_index,source_name,exercises(id,name)").in("block_id",blockIds).order("order_index"),
-      sb.from("progression_week_notes").select("id,block_id,week_number,notes").in("block_id",blockIds).order("week_number")
+async function loadPlan(id){
+  setStatus("Ładowanie planu...","loading");render();
+  try{
+    STATE.currentPlan=STATE.plans.find(p=>p.id===id)||null;
+    if(!STATE.currentPlan)throw new Error("Nie znaleziono planu");
+    const [pa,tr,blocks,res]=await Promise.all([
+      sb.from("plan_athletes").select("athletes(id,client_key,name,status)").eq("plan_id",id),
+      sb.from("trainings").select("id,plan_id,name,focus,order_index,source_row").eq("plan_id",id).order("order_index"),
+      sb.from("progression_blocks").select("id,plan_id,name,block_index,start_week,end_week,notes").eq("plan_id",id).order("block_index"),
+      sb.from("plan_resources").select("id,plan_id,label,url,resource_type,notes").eq("plan_id",id).order("created_at")
     ]);
-    if(pe.error)throw pe.error;if(wn.error)throw wn.error;
-    app.progressionExercises=pe.data||[];app.weekNotes=wn.data||[];
-    const peIds=app.progressionExercises.map(x=>x.id);
-    if(peIds.length){
-      const ps=await sb.from("progression_sets").select("id,progression_exercise_id,week_number,set_no,label,reps_text,kg,raw_text,load_text,set_count,is_skip,is_deload,rest_text,notes").in("progression_exercise_id",peIds).order("week_number");
-      if(ps.error)throw ps.error;
-      app.progressionSets=ps.data||[];
-    }
-  }
-  app.setLogs=[];
-  const sessionIds=app.sessions.map(s=>s.id);
-  if(sessionIds.length){
-    const logs=await sb.from("workout_set_logs").select("id,workout_session_id,athlete_id,plan_id,source_plan_key,client_key,session_id,exercise_no,exercise_name,set_no,planned_label,kg,reps_text,rpe,done,note,recorded_at").in("workout_session_id",sessionIds).order("session_id").order("set_no");
-    if(logs.error)throw logs.error;
-    app.setLogs=logs.data||[];
-  }
-  loadDraft();
-  const next=nextPendingSession();
-  app.activeSessionId=next?.id||schedule()[0]?.id||null;
-  app.previewWeek=next?.week||Math.min(Number(app.plan.weeks)||1,firstGeneratedWeek());
-  setStatus(`Połączono · ${app.athlete.name} · ${app.plan.name}`,"ok");
+    if(pa.error)throw pa.error;if(tr.error)throw tr.error;if(blocks.error)throw blocks.error;if(res.error)throw res.error;
+    STATE.assignedAthletes=(pa.data||[]).map(x=>x.athletes).filter(Boolean);
+    STATE.trainings=tr.data||[];
+    STATE.blocks=blocks.data||[];
+    if(!STATE.blocks.some(b=>b.id===STATE.activeBlockId))STATE.activeBlockId=STATE.blocks[0]?.id||null;
+    STATE.resources=res.data||[];
+    const trainingIds=STATE.trainings.map(t=>t.id);
+    if(trainingIds.length){
+      const te=await sb.from("training_exercises").select("id,training_id,exercise_id,exercise_no,order_index,sets_text,reps_text,rest_text,weight,load_text,tempo_text,use_wg,progression_mode,superset_key,group_label,mode,notes,video_hint,progression_raw,exercises(id,name,youtube_url,default_mode,default_category)").in("training_id",trainingIds).order("order_index");
+      if(te.error)throw te.error; STATE.trainingExercises=te.data||[];
+    }else STATE.trainingExercises=[];
+    const blockIds=STATE.blocks.map(b=>b.id);
+    if(blockIds.length){
+      const [pe,wn]=await Promise.all([
+        sb.from("progression_exercises").select("id,block_id,exercise_id,training_exercise_id,order_index,notes,source_name,exercises(id,name)").in("block_id",blockIds).order("order_index"),
+        sb.from("progression_week_notes").select("id,block_id,week_number,notes").in("block_id",blockIds).order("week_number")
+      ]);
+      if(pe.error)throw pe.error;if(wn.error)throw wn.error;
+      STATE.progressionExercises=pe.data||[];
+      STATE.weekNotes=wn.data||[];
+      const peIds=STATE.progressionExercises.map(x=>x.id);
+      if(peIds.length){
+        const ps=await sb.from("progression_sets").select("id,progression_exercise_id,week_number,set_no,label,reps_text,kg,raw_text,load_text,set_count,is_skip,is_deload,rest_text,notes,prescription").in("progression_exercise_id",peIds).order("week_number");
+        if(ps.error)throw ps.error; STATE.progressionSets=ps.data||[];
+      }else STATE.progressionSets=[];
+      absorbStatusSetsIntoWeekNotes();
+    }else{STATE.progressionExercises=[];STATE.progressionSets=[];STATE.weekNotes=[];}
+    STATE.screen="builder";STATE.tab="structure";STATE.dirty=false;STATE.lastError="";setStatus("Plan załadowany","ok");render();
+  }catch(err){setError(err);}
+}
+
+async function reloadAll(){
+  try{
+    await Promise.all([loadPlans(),loadExercises(),loadAthletes()]);
+    await loadAthleteAssignments();
+    if(STATE.currentPlan)await loadPlan(STATE.currentPlan.id);
+    else render();
+  }catch(err){setError(err);}
+}
+
+/* =========================
+   SELECTORS
+========================= */
+function getCurrentPlan(){
+  return STATE.currentPlan;
+}
+
+function getTrainingRows(trainingId){
+  return STATE.trainingExercises
+    .filter(row=>row.training_id===trainingId)
+    .sort((a,b)=>(a.order_index||0)-(b.order_index||0));
+}
+
+function getProgressionCandidates(){
+  return STATE.trainingExercises.filter(r=>(r.progression_mode&&r.progression_mode!=="none")||r.use_wg).sort((a,b)=>{
+    const ta=STATE.trainings.find(t=>t.id===a.training_id)?.order_index||0;
+    const tb=STATE.trainings.find(t=>t.id===b.training_id)?.order_index||0;
+    return ta-tb || (a.order_index||0)-(b.order_index||0);
+  });
+}
+
+function getActiveBlock(){
+  return STATE.blocks.find(b=>b.id===STATE.activeBlockId)||STATE.blocks[0]||null;
+}
+
+function getAthleteLinks(athleteId){
+  return STATE.athletePlanLinks.filter(x=>x.athlete_id===athleteId).sort((a,b)=>{
+    const ap=a.plans||{},bp=b.plans||{};
+    const as=ap.status==="active"?0:ap.status==="draft"?1:2;
+    const bs=bp.status==="active"?0:bp.status==="draft"?1:2;
+    return as-bs || String(bp.created_at||"").localeCompare(String(ap.created_at||""));
+  });
+}
+
+function getBuilderStep(){
+  return BUILDER_STEPS.some(step=>step.id===STATE.tab)?STATE.tab:"overview";
+}
+
+function progressionCandidates(){
+  return getProgressionCandidates();
+}
+
+function activeBlock(){
+  return getActiveBlock();
+}
+
+function athletePlanLinks(athleteId){
+  return getAthleteLinks(athleteId);
+}
+
+function activeAthletePlan(athleteId){
+  return getAthleteLinks(athleteId).find(x=>(x.plans||{}).status==="active")||getAthleteLinks(athleteId)[0]||null;
+}
+
+function blockWeeks(block){
+  const start=Math.max(1,Number(block?.start_week)||1);
+  const end=Math.max(start,Number(block?.end_week)||start);
+  return Array.from({length:end-start+1},(_,i)=>start+i);
+}
+
+function workoutLogsForSession(preview,sessionDbId){
+  return (preview.workoutSetLogs||[])
+    .filter(l=>l.workout_session_id===sessionDbId)
+    .sort((a,b)=>exerciseNoCompare(a.exercise_no,b.exercise_no)||(Number(a.set_no)||0)-(Number(b.set_no)||0)||String(a.exercise_name||"").localeCompare(String(b.exercise_name||"")));
+}
+
+function exerciseNoCompare(a,b){
+  const pa=parseExerciseNo(a),pb=parseExerciseNo(b);
+  return pa.n-pb.n || pa.s.localeCompare(pb.s) || pa.raw.localeCompare(pb.raw);
+}
+
+function parseExerciseNo(value){
+  const raw=String(value||"").trim();
+  const match=raw.match(/^(\d+)([a-z]*)/i);
+  return {raw,n:match?Number(match[1]):9999,s:match?match[2].toLowerCase():raw.toLowerCase()};
+}
+
+function avgRpe(logs){
+  const values=logs.map(l=>Number(l.rpe)).filter(Number.isFinite);
+  if(!values.length)return "-";
+  const avg=values.reduce((sum,v)=>sum+v,0)/values.length;
+  return money(Math.round(avg*10)/10);
+}
+
+function shortDate(value){
+  return value?String(value).slice(0,10):"-";
+}
+
+function metric(value){
+  return value===null||value===undefined||value===""?"-":money(value);
+}
+
+function statusLabel(status){
+  const text=String(status||"").trim();
+  return text==="done"?"zrobiony":text||"-";
+}
+
+function previewWeekNotes(preview,week){
+  const blocks=preview.blocks.filter(b=>Number(b.start_week)<=Number(week)&&Number(b.end_week)>=Number(week));
+  return preview.weekNotes.filter(n=>Number(n.week_number)===Number(week)&&blocks.some(b=>b.id===n.block_id)).map(n=>n.notes).filter(Boolean).join("; ");
+}
+
+/* =========================
+   MUTATIONS
+========================= */
+function setActiveBlock(id){
+  STATE.activeBlockId=id;
   render();
 }
-function workouts(){return app.trainings.map((t,i)=>({num:String(i+1),...t,exercises:app.trainingExercises.filter(r=>r.training_id===t.id).sort((a,b)=>(a.order_index||0)-(b.order_index||0))}))}
-function workoutByNum(num){return workouts().find(w=>String(w.num)===String(num))||workouts()[0]}
-function sessionMap(){return new Map(app.sessions.map(s=>[s.session_id,s]))}
-function maxDbWeek(){return app.sessions.reduce((m,s)=>Math.max(m,Number(s.week_number)||0),0)}
-function firstGeneratedWeek(){
-  const max=maxDbWeek();
-  if(!max)return 1;
-  const candidate=max+1;
-  const containing=app.blocks.filter(b=>Number(b.start_week)<=candidate&&Number(b.end_week)>=candidate).sort((a,b)=>Number(b.start_week)-Number(a.start_week))[0];
-  if(containing)return Number(containing.start_week)||candidate;
-  const future=app.blocks.filter(b=>Number(b.start_week)>max).sort((a,b)=>Number(a.start_week)-Number(b.start_week))[0];
-  return future?Number(future.start_week):candidate;
+
+function selectAthlete(id){
+  STATE.selectedAthleteId=id;
+  if(STATE.athletePreview?.athleteId!==id)STATE.athletePreview=null;
+  STATE.selectedWorkoutSessionId=null;
+  STATE.athleteTab="profile";
+  render();
 }
-function nominalDateFor(week,num){return addDays(app.plan.start_date||todayISO(),(Number(week)-1)*7+(WORKOUT_OFFSETS[Number(num)-1]??((Number(num)-1)*2)))}
-function schedule(){
-  if(!app.plan)return[];
-  const map=sessionMap(), generatedStart=firstGeneratedWeek(), out=[];
-  for(const s of app.sessions){
-    if(Number(s.week_number)<generatedStart)out.push(sessionFromDb(s));
-  }
-  for(let week=generatedStart;week<=Number(app.plan.weeks||1);week++){
-    for(const w of workouts()){
-      const id=`W${week}T${w.num}`;
-      const db=map.get(id);
-      out.push(db?sessionFromDb(db):{id,week,workoutNum:w.num,workoutId:w.num,workoutName:w.name,date:nominalDateFor(week,w.num),nominalDate:nominalDateFor(week,w.num),db:null});
+
+function setPreviewWeek(week){
+  STATE.previewWeek=Number(week)||1;
+  render();
+}
+
+function setAthleteTab(tab){
+  STATE.athleteTab=tab;
+  render();
+}
+
+function selectWorkoutSession(id){
+  STATE.selectedWorkoutSessionId=id;
+  render();
+}
+
+function openAthletePlan(athleteId,planId,tab="history"){
+  STATE.athleteTab=tab;
+  loadAthletePreview(athleteId,planId);
+}
+
+function loadSelectedAthletePlan(athleteId,selectId){
+  const planId=document.getElementById(selectId)?.value;
+  if(!planId){showToast("Wybierz przypisany plan");return;}
+  STATE.athleteTab=STATE.athleteTab||"history";
+  loadAthletePreview(athleteId,planId);
+}
+
+function updateAthlete(id,field,value){
+  const athlete=STATE.athletes.find(x=>x.id===id);
+  if(!athlete)return;
+  athlete[field]=field==="client_key"?slugify(value):value;
+  markDirty();
+}
+
+function updatePlanField(field,value){
+  const plan=getCurrentPlan();
+  if(!plan)return;
+  plan[field]=value;
+  markDirty();
+}
+
+function updateTraining(id,field,value){
+  const training=STATE.trainings.find(x=>x.id===id);
+  if(!training)return;
+  training[field]=value;
+  markDirty();
+}
+
+function updateTrainingExercise(id,field,value,rerender=false){
+  const row=STATE.trainingExercises.find(x=>x.id===id);
+  if(!row)return;
+  row[field]=value;
+  if(field==="progression_mode")row.use_wg=value==="prescribed_weight";
+  markDirty();
+  if(rerender)render();
+}
+
+function updateResource(id,field,value){
+  const resource=STATE.resources.find(x=>x.id===id);
+  if(!resource)return;
+  resource[field]=value;
+  markDirty();
+}
+
+function updateExercise(id,field,value){
+  const exercise=STATE.exercises.find(x=>x.id===id);
+  if(!exercise)return;
+  exercise[field]=value;
+  markDirty();
+}
+
+/* =========================
+   RENDER SHELL
+========================= */
+function showPlans(){STATE.screen="plans";STATE.currentPlan=null;STATE.lastError="";render();}
+async function showAthletes(){
+  STATE.screen="athletes";STATE.currentPlan=null;STATE.lastError="";
+  if(!STATE.selectedAthleteId&&STATE.athletes[0])STATE.selectedAthleteId=STATE.athletes[0].id;
+  render();
+  try{await loadAthleteAssignments();render();}catch(err){setError(err);}
+}
+function showExercises(){STATE.screen="exercises";STATE.currentPlan=null;STATE.lastError="";render();}
+function switchTab(tab){STATE.tab=tab;render();}
+function render(){
+  document.getElementById("navPlans").classList.toggle("active",STATE.screen==="plans"||STATE.screen==="builder");
+  document.getElementById("navAthletes").classList.toggle("active",STATE.screen==="athletes");
+  document.getElementById("navExercises").classList.toggle("active",STATE.screen==="exercises");
+  if(STATE.screen==="builder")return renderBuilder();
+  if(STATE.screen==="athletes")return renderAthletes();
+  if(STATE.screen==="exercises")return renderExercises();
+  renderPlans();
+}
+
+function renderPlans(){
+  document.getElementById("main").innerHTML=`
+    <div class="topbar"><div><div class="eyebrow">Supabase</div><div class="title">Plany</div>${statusHTML()}</div><div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="createPlan()">Nowy plan</button></div></div>
+    <div class="note">Ten panel służy do ręcznego zbudowania planu w takim zakresie jak arkusz: treningi, ćwiczenia, superserie, tygodniowa progresja, materiały wideo i notatki tygodni w bloku.</div>
+    <div class="cards">${STATE.plans.map(p=>`<div class="planCard" onclick="loadPlan('${p.id}')"><div class="small">${esc(p.status).toUpperCase()}</div><div style="font-size:23px;font-weight:950;margin-top:8px">${esc(p.name)}</div><div class="small" style="margin-top:10px">${esc(p.weeks)} tyg. · start ${esc(p.start_date)}</div><div class="small">${esc(p.slug)}</div></div>`).join("")}<div class="planCard new" onclick="createPlan()">+ Nowy plan</div></div>`;
+}
+
+async function createPlan(){
+  const name=prompt("Nazwa planu","Nowy plan");
+  if(!name||!name.trim())return;
+  const weeks=Number(prompt("Liczba tygodni","12")||12);
+  const start=prompt("Data startu YYYY-MM-DD",todayISO())||todayISO();
+  try{
+    const slug=`${slugify(name)}_${Date.now().toString(36)}`;
+    const {data,error}=await sb.from("plans").insert({slug,name:name.trim(),start_date:start,weeks:Math.max(1,weeks),status:"draft"}).select("id,slug,name,start_date,weeks,status,notes,created_at").single();
+    if(error)throw error;
+    await loadPlans();
+    showToast("Utworzono plan");
+    await loadPlan(data.id);
+  }catch(err){setError(err);}
+}
+
+function renderBuilder(){
+  const p=getCurrentPlan();
+  const activeStep=getBuilderStep();
+  if(!p)return renderPlans();
+  document.getElementById("main").innerHTML=`
+    <div class="topbar">
+      <div><div class="eyebrow">Plan builder</div><div class="title">${esc(p.name)}</div><div class="small">${esc(p.status||"draft")} · start ${esc(p.start_date||"-")} · ${esc(p.weeks||"-")} tyg.</div>${statusHTML()}</div>
+      <div class="btnRow"><button class="btn secondary" onclick="showPlans()">Wróć</button><button class="btn good" onclick="savePlan()" ${STATE.saving?"disabled":""}>Zapisz <span data-dirty class="pill ${STATE.dirty?"warn":""}">${STATE.dirty?"zmiany":"ok"}</span></button></div>
+    </div>
+    <div class="builderNav">${builderStepNavHTML(activeStep)}</div>
+    <div class="builderPane">${builderStepContentHTML(activeStep)}</div>`;
+}
+
+function builderStepNavHTML(activeStep){
+  return BUILDER_STEPS.map((step,index)=>`
+    <button class="builderStep ${activeStep===step.id?"active":""}" onclick="switchTab('${step.id}')">
+      <span>${esc(step.label)}</span>
+      <span class="builderStepNo">${index+1}</span>
+    </button>
+  `).join("");
+}
+
+function builderStepContentHTML(step){
+  if(step==="overview")return `<div class="section">${settingsHTML()}</div>`;
+  if(step==="structure")return structureHTML();
+  if(step==="progression")return progressionHTML();
+  return `<div class="section">${settingsHTML()}</div>`;
+}
+
+function builderPlaceholderHTML(title,text){
+  return `<div class="builderPlaceholder"><strong>${esc(title)}</strong>${esc(text)}</div>`;
+}
+
+/* =========================
+   PLAN BUILDER
+========================= */
+function settingsHTML(){
+  const p=getCurrentPlan();
+  return `<div class="sectionTitle">Ustawienia planu</div>
+    <div class="grid4">
+      <div class="field"><label>Nazwa</label><input value="${esc(p.name)}" oninput="updatePlanField('name',this.value)"></div>
+      <div class="field"><label>Start</label><input type="date" value="${esc(p.start_date)}" onchange="updatePlanField('start_date',this.value)"></div>
+      <div class="field"><label>Tygodnie</label><input type="number" min="1" value="${esc(p.weeks)}" onchange="updatePlanField('weeks',Number(this.value))"></div>
+      <div class="field"><label>Status</label><select onchange="updatePlanField('status',this.value)"><option value="draft" ${p.status==="draft"?"selected":""}>draft</option><option value="active" ${p.status==="active"?"selected":""}>active</option><option value="archived" ${p.status==="archived"?"selected":""}>archived</option></select></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="field"><label>Notatki</label><textarea oninput="updatePlanField('notes',this.value)">${esc(p.notes||"")}</textarea></div>
+      <div class="field"><label>Podopieczny</label>${athleteAssignmentHTML()}<div class="btnRow" style="margin-top:8px"><button class="btn secondary" onclick="assignSelectedAthlete()">Przypisz</button><button class="btn secondary" onclick="createAthleteFromPrompt()">Nowy podopieczny</button></div></div>
+    </div>`;
+}
+
+function athleteAssignmentHTML(){
+  const assigned=new Set(STATE.assignedAthletes.map(a=>a.id));
+  return `<select id="assignAthlete"><option value="">Wybierz podopiecznego</option>${STATE.athletes.map(a=>`<option value="${a.id}">${esc(a.name)} · ${esc(a.client_key)}${assigned.has(a.id)?" · przypisany":""}</option>`).join("")}</select><div style="margin-top:8px">${STATE.assignedAthletes.map(a=>`<span class="pill good">${esc(a.name)} · ${esc(a.client_key)}</span>`).join("")||`<span class="small">Brak przypisanego podopiecznego</span>`}</div>`;
+}
+
+function structureHTML(){
+  return `<div class="section">
+    <div class="sectionTitle">Treningi</div>
+    <div class="note">Tu budujesz treningi: ćwiczenia, serie, powtórzenia, przerwy, tempo, superserie i informację, które ćwiczenia mają progresję tygodniową.</div>
+    ${STATE.trainings.map(trainingHTML).join("")||`<div class="empty">Brak treningów. Dodaj pierwszy trening.</div>`}
+    <button class="btn" onclick="createTraining()">+ Dodaj trening</button>
+  </div>`;
+}
+
+function trainingHTML(t){
+  const rows=getTrainingRows(t.id);
+  return `<div class="training">
+    <div class="trainingHead"><input value="${esc(t.name)}" oninput="updateTraining('${t.id}','name',this.value)"><input placeholder="Focus / notatka treningu" value="${esc(t.focus||"")}" oninput="updateTraining('${t.id}','focus',this.value)"><button class="btn danger" onclick="deleteTraining('${t.id}')">Usuń</button></div>
+    <div class="exerciseGrid header"><div>Nr</div><div>Ćwiczenie</div><div>Serie</div><div>Powt.</div><div>Przerwa</div><div>Ciężar</div><div>Tempo</div><div>Progresja</div><div>Typ</div><div>Superset</div><div></div></div>
+    ${rows.map(exerciseRowHTML).join("")||`<div class="empty" style="margin:12px">Brak ćwiczeń</div>`}
+    ${addExerciseHTML(t.id)}
+  </div>`;
+}
+
+function exerciseRowHTML(row){
+  const ex=row.exercises||STATE.exercises.find(e=>e.id===row.exercise_id)||{};
+  const rawPMode=row.progression_mode||(row.use_wg?"prescribed_weight":"none");
+  const pMode=rawPMode==="manual_weight"?"prescribed_weight":rawPMode;
+  return `<div class="exerciseGrid">
+    <input value="${esc(row.exercise_no||"")}" oninput="updateTrainingExercise('${row.id}','exercise_no',this.value)">
+    <div><div class="exerciseName">${esc(ex.name||row.source_name||"Ćwiczenie")}</div><input style="margin-top:6px" placeholder="Uwagi trenera" value="${esc(row.notes||"")}" oninput="updateTrainingExercise('${row.id}','notes',this.value)"></div>
+    <input value="${esc(row.sets_text||"")}" oninput="updateTrainingExercise('${row.id}','sets_text',this.value)">
+    <input value="${esc(row.reps_text||"")}" oninput="updateTrainingExercise('${row.id}','reps_text',this.value)">
+    <input value="${esc(row.rest_text||"")}" oninput="updateTrainingExercise('${row.id}','rest_text',this.value)">
+    <input value="${esc(row.load_text||money(row.weight)||"")}" placeholder="np. 15+15" oninput="updateTrainingExercise('${row.id}','load_text',this.value)">
+    <input value="${esc(row.tempo_text||"")}" placeholder="2200" oninput="updateTrainingExercise('${row.id}','tempo_text',this.value)">
+    <select onchange="updateTrainingExercise('${row.id}','progression_mode',this.value,true)"><option value="none" ${pMode==="none"?"selected":""}>brak</option><option value="prescribed_weight" ${pMode==="prescribed_weight"||pMode==="manual_weight"?"selected":""}>progresja tygodniowa</option></select>
+    <select onchange="updateTrainingExercise('${row.id}','mode',this.value)"><option value="sets" ${row.mode==="sets"?"selected":""}>sets</option><option value="time" ${row.mode==="time"?"selected":""}>time</option><option value="done" ${row.mode==="done"?"selected":""}>done</option></select>
+    <input value="${esc(row.superset_key||"")}" placeholder="SS1" oninput="updateTrainingExercise('${row.id}','superset_key',this.value)">
+    <button class="deleteX" onclick="deleteTrainingExercise('${row.id}')">×</button>
+  </div>`;
+}
+
+function addExerciseHTML(trainingId){
+  const options=STATE.exercises.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join("");
+  return `<div class="addBar"><select id="addExisting_${trainingId}"><option value="">Wybierz ćwiczenie z rejestru</option>${options}</select><button class="btn secondary" onclick="addExerciseToTraining('${trainingId}')">Dodaj</button><div class="small addExerciseHint">Nie ma ćwiczenia? Dodaj je w Rejestrze ćwiczeń.</div></div>`;
+}
+
+function progressionHTML(){
+  const candidates=getProgressionCandidates();
+  const block=getActiveBlock();
+  const blockPes=block?STATE.progressionExercises.filter(pe=>pe.block_id===block.id):[];
+  const missing=block?candidates.filter(row=>!blockPes.some(pe=>pe.training_exercise_id===row.id)).length:candidates.length;
+  return `<div class="section">
+    <div class="sectionTitle">Progresja tygodniowa</div>
+    <div class="note">Tu budujesz osobną tabelę progresji z arkusza: wybierasz zakres tygodni, a dla każdego ćwiczenia oznaczonego jako „progresja tygodniowa” wpisujesz osobne wiersze serii. Kolejne bloki możesz dodać później, kiedy plan już trwa.</div>
+    <div class="progressTop">
+      <div>
+        <div class="blockTabs">
+          ${STATE.blocks.map(b=>`<button class="blockTab ${b.id===block?.id?"active":""}" onclick="setActiveBlock('${b.id}')">${esc(b.name)} · tyg. ${esc(b.start_week)}-${esc(b.end_week)}</button>`).join("")}
+          <button class="blockTab" onclick="createProgressionBlock()">+ Dodaj blok</button>
+        </div>
+        <div class="progressMeta">
+          <span class="pill blue">${candidates.length} ćwiczeń z progresją tygodniową</span>
+          ${block?`<span class="pill ${missing?"warn":"good"}">${missing?`${missing} do połączenia`:"ćwiczenia połączone"}</span>`:""}
+        </div>
+      </div>
+      <div class="btnRow">
+        ${block?`<button class="btn secondary" onclick="syncProgressionExercises('${block.id}')">Połącz ćwiczenia</button>`:""}
+        <button class="btn good" onclick="saveProgressionGrid()" ${STATE.saving||!block?"disabled":""}>Zapisz progresję</button>
+      </div>
+    </div>
+    ${block?progressionBlockHTML(block):`<div class="empty">Dodaj pierwszy blok progresji. Potem oznacz ćwiczenia w treningach jako „progresja tygodniowa” i połącz je z blokiem.</div>`}
+  </div>`;
+}
+
+function progressionBlockHTML(block){
+  const rows=STATE.progressionExercises.filter(pe=>pe.block_id===block.id&&!pe._delete).sort((a,b)=>(a.order_index||0)-(b.order_index||0));
+  return `<div>
+    <div class="blockEditor">
+      <div class="field"><label>Nazwa bloku</label><input value="${esc(block.name||"")}" oninput="updateProgressionBlockField('${block.id}','name',this.value)"></div>
+      <div class="field"><label>Od tyg.</label><input type="number" min="1" value="${esc(block.start_week)}" onchange="updateProgressionBlockField('${block.id}','start_week',Number(this.value),true)"></div>
+      <div class="field"><label>Do tyg.</label><input type="number" min="1" value="${esc(block.end_week)}" onchange="updateProgressionBlockField('${block.id}','end_week',Number(this.value),true)"></div>
+      <div class="field"><label>Notatka</label><input value="${esc(block.notes||"")}" placeholder="np. po sprawdzeniu raportów dodamy blok 2" oninput="updateProgressionBlockField('${block.id}','notes',this.value)"></div>
+    </div>
+    ${weekNotesHTML(block)}
+    ${rows.length?rows.map(pe=>progressionExerciseCardHTML(pe,block)).join(""):`<div class="empty">Brak ćwiczeń w tym bloku. Kliknij „Połącz ćwiczenia”, żeby dodać tu pozycje oznaczone w strukturze jako „progresja tygodniowa”.</div>`}
+  </div>`;
+}
+
+function weekNotesHTML(block){
+  return `<div class="weekNotesPanel">
+    <div class="weekNotesTitle">Notatki tygodni bloku</div>
+    ${blockWeeks(block).map(week=>{
+      const note=weekNoteValue(block.id,week);
+      return `<div class="weekNoteRow"><div class="weekNoteLabel">Tydzień ${week}</div><textarea class="weekNoteInput" placeholder="np. Deload, lżejszy tydzień, sprawdzić raport" oninput="updateWeekNote('${block.id}',${week},this.value)">${esc(note)}</textarea></div>`;
+    }).join("")}
+  </div>`;
+}
+
+function progressionExerciseCardHTML(pe,block){
+  const te=STATE.trainingExercises.find(r=>r.id===pe.training_exercise_id);
+  const tr=te?STATE.trainings.find(t=>t.id===te.training_id):null;
+  const ex=te?.exercises||pe.exercises||STATE.exercises.find(e=>e.id===(te?.exercise_id||pe.exercise_id))||{};
+  const title=ex.name||pe.source_name||"Ćwiczenie";
+  const weeks=blockWeeks(block);
+  return `<div class="progressExerciseCard">
+    <div class="progressExerciseHead">
+      <div>
+        <div class="progressExerciseTitle">${esc(title)}</div>
+        <div class="small">${esc(tr?.name||"")} ${te?.exercise_no?`· pozycja ${esc(te.exercise_no)}`:""} · ${weeks.length} tyg.</div>
+      </div>
+      <div class="btnRow"><button class="btn secondary" onclick="addSetToAllWeeks('${pe.id}','${block.id}')">+ Seria we wszystkie tyg.</button><button class="btn danger" onclick="deleteProgressionExercise('${pe.id}')">Usuń z progresji</button></div>
+    </div>
+    <div class="weekStrip">${weeks.map(w=>weekCardHTML(pe,w)).join("")}</div>
+  </div>`;
+}
+
+function weekCardHTML(pe,week){
+  const sets=STATE.progressionSets.filter(s=>s.progression_exercise_id===pe.id&&Number(s.week_number)===Number(week)&&!s._delete).sort((a,b)=>(a.set_no||0)-(b.set_no||0));
+  const block=STATE.blocks.find(b=>b.id===pe.block_id);
+  const canClonePrevious=Number(week)>Number(block?.start_week||1);
+  const clonePreviousButton=canClonePrevious?`<button class="miniBtn" onclick="clonePreviousWeek('${pe.id}',${week})">Klonuj poprzedni tydz.</button>`:"";
+  return `<div class="weekCard">
+    <div class="weekTitle"><span>Tydzień ${week}</span><div class="weekActions"><button class="miniBtn good" onclick="addProgressionSet('${pe.id}',${week})">+ seria</button>${clonePreviousButton}<button class="miniBtn" onclick="cloneLastProgressionSet('${pe.id}',${week})">Klonuj ostatnią</button></div></div>
+    ${sets.length?`<div class="setHeader"><div></div><div>Ciężar</div><div>Powt.</div><div>Przerwa</div><div></div></div>${sets.map(setRowHTML).join("")}`:`<div class="emptyWeek">Dodaj pierwszą serię</div>`}
+  </div>`;
+}
+
+function setRowHTML(s){
+  const load=s.load_text||money(s.kg)||"";
+  return `<div class="setRow">
+    <div class="setNo">${esc(s.set_no||"")}</div>
+    <div class="field"><input aria-label="Ciężar" value="${esc(load)}" placeholder="70kg" oninput="updateProgressionSetField('${s.id}','load_text',this.value)"></div>
+    <div class="field"><input aria-label="Powtórzenia" value="${esc(s.reps_text||"")}" placeholder="5+" oninput="updateProgressionSetField('${s.id}','reps_text',this.value)"></div>
+    <div class="field"><input aria-label="Przerwa" value="${esc(s.rest_text||"")}" placeholder="3 min" oninput="updateProgressionSetField('${s.id}','rest_text',this.value)"></div>
+    <div class="setActions"><button class="miniBtn" onclick="cloneProgressionSet('${s.id}')">Klonuj</button><button class="miniBtn danger" onclick="deleteProgressionSet('${s.id}')">Usuń</button></div>
+  </div>`;
+}
+
+function resourcesHTML(){
+  return `<div class="section">
+    <div class="sectionTitle">Materiały i legendy</div>
+    <div class="note">Tu zapisujesz filmy instruktażowe, rozpiski warm-up, notatki o tempie, RPE i inne materiały, które w arkuszu leżały pod planem.</div>
+    ${STATE.resources.map(resourceRowHTML).join("")||`<div class="empty">Brak materiałów.</div>`}
+    <div class="resourceRow" style="margin-top:12px"><input id="resLabel" placeholder="Nazwa, np. Dynamiczny Warm-up"><input id="resUrl" placeholder="URL YouTube albo puste"><select id="resType"><option value="video">video</option><option value="note">note</option><option value="tempo">tempo</option><option value="rpe">rpe</option><option value="other">other</option></select><input id="resNotes" placeholder="Notatka"><button class="btn secondary" onclick="addResource()">+ Dodaj</button></div>
+  </div>`;
+}
+
+function resourceRowHTML(r){
+  return `<div class="resourceRow"><input value="${esc(r.label)}" oninput="updateResource('${r.id}','label',this.value)"><input value="${esc(r.url||"")}" oninput="updateResource('${r.id}','url',this.value)"><select onchange="updateResource('${r.id}','resource_type',this.value)"><option value="video" ${r.resource_type==="video"?"selected":""}>video</option><option value="note" ${r.resource_type==="note"?"selected":""}>note</option><option value="tempo" ${r.resource_type==="tempo"?"selected":""}>tempo</option><option value="rpe" ${r.resource_type==="rpe"?"selected":""}>rpe</option><option value="other" ${r.resource_type==="other"?"selected":""}>other</option></select><input value="${esc(r.notes||"")}" oninput="updateResource('${r.id}','notes',this.value)"><button class="deleteX" onclick="deleteResource('${r.id}')">×</button></div>`;
+}
+
+
+async function createTraining(){
+  const currentPlan=getCurrentPlan();
+  if(!currentPlan)return;
+  const next=STATE.trainings.reduce((m,t)=>Math.max(m,Number(t.order_index)||0),0)+1;
+  const name=prompt("Nazwa treningu",`${next} TRENING`);
+  if(!name)return;
+  try{
+    const {error}=await sb.from("trainings").insert({plan_id:currentPlan.id,name,focus:null,order_index:next});
+    if(error)throw error;await loadPlan(currentPlan.id);
+  }catch(err){setError(err);}
+}
+async function deleteTraining(id){
+  if(!confirm("Usunąć trening i jego ćwiczenia?"))return;
+  try{const {error}=await sb.from("trainings").delete().eq("id",id);if(error)throw error;await loadPlan(getCurrentPlan().id);}catch(err){setError(err);}
+}
+
+async function addExerciseToTraining(trainingId){
+  const select=document.getElementById(`addExisting_${trainingId}`);
+  const input=document.getElementById(`addNew_${trainingId}`);
+  let exerciseId=select.value;
+  try{
+    if(!exerciseId){
+      const name=input?.value.trim()||"";
+      if(!name){showToast("Wybierz ćwiczenie z rejestru");return;}
+      let existing=STATE.exercises.find(e=>norm(e.name)===norm(name));
+      if(!existing){
+        const {data,error}=await sb.from("exercises").insert({name,default_mode:"sets",default_category:"accessory"}).select("id,name,youtube_url,notes,default_mode,default_category").single();
+        if(error)throw error;existing=data;STATE.exercises.push(existing);
+      }
+      exerciseId=existing.id;
     }
+    const ex=STATE.exercises.find(e=>e.id===exerciseId);
+    const rows=STATE.trainingExercises.filter(r=>r.training_id===trainingId);
+    const order=rows.reduce((m,r)=>Math.max(m,Number(r.order_index)||0),0)+1;
+    const no=String(rows.reduce((m,r)=>Math.max(m,parseInt(String(r.exercise_no||r.order_index||"0").match(/\d+/)?.[0]||"0",10)),0)+1);
+    const {error}=await sb.from("training_exercises").insert({training_id:trainingId,exercise_id:exerciseId,exercise_no:no,order_index:order,sets_text:"",reps_text:"",rest_text:"",load_text:null,tempo_text:null,progression_mode:"none",use_wg:false,mode:ex?.default_mode||"sets",notes:null,progression_raw:{}});
+    if(error)throw error;await loadPlan(getCurrentPlan().id);
+  }catch(err){setError(err);}
+}
+async function deleteTrainingExercise(id){
+  if(!confirm("Usunąć ćwiczenie z treningu?"))return;
+  try{const {error}=await sb.from("training_exercises").delete().eq("id",id);if(error)throw error;await loadPlan(getCurrentPlan().id);}catch(err){setError(err);}
+}
+
+async function ensureProgressionBlock(){
+  return createProgressionBlock();
+}
+
+async function createProgressionBlock(){
+  const currentPlan=getCurrentPlan();
+  if(!currentPlan)return;
+  const last=[...STATE.blocks].sort((a,b)=>(Number(a.block_index)||0)-(Number(b.block_index)||0)).at(-1);
+  const nextIndex=(Number(last?.block_index)||STATE.blocks.length)+1;
+  const defaultStart=last?Number(last.end_week)+1:1;
+  const defaultWeeks=last?4:Math.max(1,Number(currentPlan.weeks)||12);
+  const name=prompt("Nazwa bloku",`BLOK ${nextIndex}`);
+  if(!name||!name.trim())return;
+  const start=Number(prompt("Pierwszy tydzień bloku",String(defaultStart))||defaultStart);
+  const weeks=Number(prompt("Ile tygodni ma blok",String(defaultWeeks))||defaultWeeks);
+  const safeStart=Math.max(1,start||defaultStart);
+  const safeWeeks=Math.max(1,weeks||defaultWeeks);
+  try{
+    const {data,error}=await sb.from("progression_blocks").insert({plan_id:currentPlan.id,name:name.trim(),block_index:nextIndex,start_week:safeStart,end_week:safeStart+safeWeeks-1,notes:null}).select("id").single();
+    if(error)throw error;
+    STATE.activeBlockId=data.id;
+    await loadPlan(currentPlan.id);
+    STATE.activeBlockId=data.id;
+    STATE.tab="progression";
+    await syncProgressionExercises(data.id);
+  }catch(err){setError(err);}
+}
+
+function updateProgressionBlockField(id,field,value,rerender=false){
+  const block=STATE.blocks.find(b=>b.id===id);
+  if(!block)return;
+  block[field]=field==="start_week"||field==="end_week"?Math.max(1,Number(value)||1):value;
+  if(Number(block.start_week)>Number(block.end_week))block.end_week=block.start_week;
+  markDirty();
+  if(rerender)render();
+}
+
+function weekNoteValue(blockId,week){
+  const row=STATE.weekNotes.find(n=>n.block_id===blockId&&Number(n.week_number)===Number(week));
+  return row?.notes||"";
+}
+
+function updateWeekNote(blockId,week,value){
+  let row=STATE.weekNotes.find(n=>n.block_id===blockId&&Number(n.week_number)===Number(week));
+  if(!row){
+    row={id:tempId(),block_id:blockId,week_number:week,notes:value};
+    STATE.weekNotes.push(row);
+  }else row.notes=value;
+  markDirty();
+}
+
+function isStatusLikeSet(s){
+  const text=norm(`${s.label||""} ${s.raw_text||""}`);
+  return Boolean(s.is_skip||s.is_deload||/skip|pomin|deload/.test(text));
+}
+
+function statusSetText(s){
+  const text=norm(`${s.label||""} ${s.raw_text||""}`);
+  if(s.is_deload||/deload/.test(text))return "Deload";
+  if(s.is_skip||/skip|pomin/.test(text))return "";
+  return s.raw_text||s.label||"";
+}
+
+function absorbStatusSetsIntoWeekNotes(){
+  for(const set of STATE.progressionSets){
+    if(!isStatusLikeSet(set))continue;
+    const pe=STATE.progressionExercises.find(row=>row.id===set.progression_exercise_id);
+    if(!pe)continue;
+    const text=statusSetText(set);
+    if(text){
+      let note=STATE.weekNotes.find(n=>n.block_id===pe.block_id&&Number(n.week_number)===Number(set.week_number));
+      if(!note){
+        note={id:tempId(),block_id:pe.block_id,week_number:set.week_number,notes:text};
+        STATE.weekNotes.push(note);
+      }else if(!norm(note.notes).includes(norm(text))){
+        note.notes=[note.notes,text].filter(Boolean).join("; ");
+      }
+    }
+    set._delete=true;
   }
-  const seen=new Set(out.map(s=>s.id));
-  for(const s of app.sessions){if(!seen.has(s.session_id))out.push(sessionFromDb(s))}
-  return out.sort((a,b)=>(a.week-b.week)||Number(a.workoutNum)-Number(b.workoutNum)||String(a.date).localeCompare(String(b.date)));
 }
-function sessionFromDb(s){return {id:s.session_id,week:Number(s.week_number)||1,workoutNum:String(s.workout_id||"1"),workoutId:String(s.workout_id||"1"),workoutName:s.workout_name||`${s.workout_id} TRENING`,date:s.workout_date||s.performed_date,nominalDate:s.workout_date||s.performed_date,performedDate:s.performed_date,db:s}}
-function currentSession(){return schedule().find(s=>s.id===app.activeSessionId)||nextPendingSession()||schedule()[0]}
-function dbForSession(sess=currentSession()){return sess?.db||sessionMap().get(sess?.id)}
-function isDbDone(sess=currentSession()){const db=dbForSession(sess);return !!db&&String(db.status||"").startsWith("done")}
-function sessionKey(sess=currentSession()){return `${sess.id}`}
-function exerciseKey(row,sess=currentSession()){return `${sess.id}__${row.id}`}
-function sourceName(row){return row.exercises?.name||"Ćwiczenie"}
-function rowMode(row,sess=currentSession()){
-  const override=app.draft.modeOverrides[row.id];
-  if(override)return override;
-  if(progressionFor(row,sess.week).length)return"sets";
-  const mode=row.mode||"sets";
-  if(mode!=="sets")return mode;
-  if(/min|sek|czas/i.test(String(row.reps_text||"")))return"time";
-  return"sets";
+
+async function syncProgressionExercises(blockId){
+  const block=STATE.blocks.find(b=>b.id===blockId);
+  if(!block)return;
+  const candidates=progressionCandidates();
+  if(!candidates.length){showToast("Brak ćwiczeń oznaczonych jako progresja tygodniowa");return;}
+  const existingByTe=new Map(STATE.progressionExercises.filter(pe=>pe.block_id===blockId&&pe.training_exercise_id).map(pe=>[pe.training_exercise_id,pe]));
+  const toCreate=candidates.filter(row=>!existingByTe.has(row.id));
+  if(!toCreate.length){showToast("Ćwiczenia są już połączone");return;}
+  try{
+    let order=STATE.progressionExercises.filter(pe=>pe.block_id===blockId).reduce((m,pe)=>Math.max(m,Number(pe.order_index)||0),0);
+    const rows=toCreate.map(row=>{
+      order++;
+      const ex=row.exercises||STATE.exercises.find(e=>e.id===row.exercise_id)||{};
+      return {block_id:blockId,exercise_id:row.exercise_id,training_exercise_id:row.id,order_index:order,source_name:ex.name||row.source_name||null};
+    });
+    const {error}=await sb.from("progression_exercises").insert(rows);
+    if(error)throw error;
+    STATE.activeBlockId=blockId;
+    await loadPlan(getCurrentPlan().id);
+    STATE.activeBlockId=blockId;
+    STATE.tab="progression";
+    showToast("Ćwiczenia dodane do bloku");
+    render();
+  }catch(err){setError(err);}
 }
-function progressionExerciseMatches(row,week){
-  const blocks=app.blocks.filter(b=>Number(b.start_week)<=Number(week)&&Number(b.end_week)>=Number(week));
-  const candidates=app.progressionExercises.filter(x=>blocks.some(b=>b.id===x.block_id));
-  const exact=candidates.filter(x=>x.training_exercise_id===row.id);
-  if(exact.length)return exact;
-  const byExercise=candidates.filter(x=>!x.training_exercise_id&&row.exercise_id&&x.exercise_id===row.exercise_id);
-  if(byExercise.length)return byExercise;
-  const rowName=norm(sourceName(row));
-  return candidates.filter(x=>!x.training_exercise_id&&norm(x.source_name||x.exercises?.name)===rowName);
+
+function isTempId(id){
+  return String(id||"").startsWith("tmp_");
 }
-function progressionFor(row,week){
-  const matches=progressionExerciseMatches(row,week);
-  if(!matches.length)return[];
-  const order=new Map(matches.map((x,i)=>[x.id,Number(x.order_index||i)]));
-  const ids=new Set(matches.map(x=>x.id));
-  return expandProgressionRows(app.progressionSets
-    .filter(s=>ids.has(s.progression_exercise_id)&&Number(s.week_number)===Number(week))
-    .sort((a,b)=>(order.get(a.progression_exercise_id)-order.get(b.progression_exercise_id))||Number(a.set_no||0)-Number(b.set_no||0)));
+
+function nextSetNo(peId,week){
+  return STATE.progressionSets
+    .filter(s=>s.progression_exercise_id===peId&&Number(s.week_number)===Number(week)&&!s._delete)
+    .reduce((m,s)=>Math.max(m,Number(s.set_no)||0),0)+1;
 }
-function expandProgressionRows(rows){
-  const out=[];
-  for(const row of rows){
-    const repeat=Math.max(1,Number(row.set_count)||1);
-    for(let i=0;i<repeat;i++)out.push({...row,_expanded_index:i,_expanded_count:repeat});
+
+function addProgressionSet(peId,week,seed={}){
+  const set_no=nextSetNo(peId,week);
+  STATE.progressionSets.push({id:tempId(),progression_exercise_id:peId,week_number:week,set_no,label:"Seria",reps_text:"",kg:null,load_text:"",rest_text:"",raw_text:null,set_count:null,is_skip:false,is_deload:false,notes:null,...seed});
+  markDirty();
+  render();
+}
+
+function addSetToAllWeeks(peId,blockId){
+  const block=STATE.blocks.find(b=>b.id===blockId);
+  if(!block)return;
+  for(const week of blockWeeks(block)){
+    STATE.progressionSets.push({id:tempId(),progression_exercise_id:peId,week_number:week,set_no:nextSetNo(peId,week),label:"Seria",reps_text:"",kg:null,load_text:"",rest_text:"",raw_text:null,set_count:null,is_skip:false,is_deload:false,notes:null});
   }
-  return out;
+  markDirty();
+  render();
 }
-function formatProgressionSet(s){
+
+function cloneLastProgressionSet(peId,week){
+  const sets=STATE.progressionSets.filter(s=>s.progression_exercise_id===peId&&Number(s.week_number)===Number(week)&&!s._delete).sort((a,b)=>(a.set_no||0)-(b.set_no||0));
+  if(!sets.length)return addProgressionSet(peId,week);
+  cloneProgressionSet(sets.at(-1).id);
+}
+
+function clonePreviousWeek(peId,week){
+  const prevWeek=Number(week)-1;
+  const sourceSets=STATE.progressionSets
+    .filter(s=>s.progression_exercise_id===peId&&Number(s.week_number)===prevWeek&&!s._delete)
+    .sort((a,b)=>(a.set_no||0)-(b.set_no||0));
+  if(!sourceSets.length){showToast("Poprzedni tydzień nie ma serii");return;}
+  const currentSets=STATE.progressionSets.filter(s=>s.progression_exercise_id===peId&&Number(s.week_number)===Number(week)&&!s._delete);
+  if(currentSets.length&&!confirm("Ten tydzień ma już serie. Zastąpić je poprzednim tygodniem?"))return;
+  for(const row of currentSets){
+    if(isTempId(row.id))STATE.progressionSets=STATE.progressionSets.filter(s=>s.id!==row.id);
+    else row._delete=true;
+  }
+  for(const source of sourceSets){
+    STATE.progressionSets.push({
+      ...source,
+      id:tempId(),
+      week_number:Number(week),
+      raw_text:source.raw_text||buildProgressionSetRaw(source),
+      _delete:false
+    });
+  }
+  markDirty();
+  render();
+}
+
+function cloneProgressionSet(id){
+  const source=STATE.progressionSets.find(s=>s.id===id);
+  if(!source)return;
+  STATE.progressionSets.push({...source,id:tempId(),set_no:nextSetNo(source.progression_exercise_id,source.week_number),raw_text:source.raw_text||buildProgressionSetRaw(source),_delete:false});
+  markDirty();
+  render();
+}
+
+function deleteProgressionSet(id){
+  const row=STATE.progressionSets.find(s=>s.id===id);
+  if(!row)return;
+  if(isTempId(id))STATE.progressionSets=STATE.progressionSets.filter(s=>s.id!==id);
+  else row._delete=true;
+  markDirty();
+  render();
+}
+
+function deleteProgressionExercise(id){
+  const row=STATE.progressionExercises.find(pe=>pe.id===id);
+  if(!row)return;
+  const sets=STATE.progressionSets.filter(s=>s.progression_exercise_id===id&&!s._delete);
+  const name=row.exercises?.name||row.source_name||"to ćwiczenie";
+  const suffix=sets.length?` razem z ${sets.length} seriami`:"";
+  if(!confirm(`Usunąć ${name} z progresji${suffix}? Ćwiczenie zostanie w treningu i rejestrze.`))return;
+  if(isTempId(id)){
+    STATE.progressionExercises=STATE.progressionExercises.filter(pe=>pe.id!==id);
+    STATE.progressionSets=STATE.progressionSets.filter(s=>s.progression_exercise_id!==id);
+  }else{
+    row._delete=true;
+    for(const set of sets)set._delete=true;
+  }
+  markDirty();
+  render();
+}
+
+function updateProgressionSetField(id,field,value){
+  const row=STATE.progressionSets.find(s=>s.id===id);
+  if(!row)return;
+  row[field]=value;
+  if(field==="load_text")row.kg=parseLoadKg(value);
+  markDirty();
+}
+
+function parseLoadKg(value){
+  const text=String(value||"").trim().replace(/\s*kg$/i,"").replace(",",".");
+  return /^-?\d+(?:\.\d+)?$/.test(text)?Number(text):null;
+}
+
+function buildProgressionSetRaw(s){
+  const label=String(s.label||"").trim();
+  const labelNorm=norm(label);
+  const hasStructuredText=String(s.load_text||"").trim()||String(s.reps_text||"").trim()||String(s.rest_text||"").trim()||s.kg!==null&&s.kg!==undefined;
+  if(s.raw_text&&!hasStructuredText&&(!label||labelNorm==="seria"||labelNorm==="plan tygodnia"))return s.raw_text;
   const load=String(s.load_text||money(s.kg)||"").trim();
   const reps=String(s.reps_text||"").trim();
-  const rest=String(s.rest_text||"").trim();
-  const raw=String(s.raw_text||"").trim();
-  const main=[load,reps].filter(Boolean).join(" / ");
-  return raw||[main,rest].filter(Boolean).join(" · ")||s.label||`Seria ${s.set_no}`;
+  const main=[load,reps].filter(Boolean).join("/");
+  if(label&&labelNorm!=="seria"&&main)return `${label} ${main}`;
+  return main||label||"";
 }
-function plannedSignature(row,sess=currentSession()){
-  const rx=progressionFor(row,sess.week);
-  if(rx.length)return `rx:${rx.map(s=>[s.progression_exercise_id,s.week_number,s.set_no,s.raw_text,s.load_text,s.kg,s.reps_text,s.rest_text,s.set_count,s._expanded_index].join("/")).join("|")}`;
-  return `base:${row.mode||""}|${row.sets_text||""}|${row.reps_text||""}|${row.rest_text||""}|${row.load_text||""}|${row.weight||""}`;
+
+function progressionSetPayload(s){
+  const label=String(s.label||"Seria").trim()||"Seria";
+  const raw=buildProgressionSetRaw({...s,label});
+  const loadText=String(s.load_text||money(s.kg)||"").trim();
+  const kg=parseLoadKg(loadText);
+  return {
+    label,
+    reps_text:String(s.reps_text||"").trim()||null,
+    kg,
+    load_text:loadText||null,
+    rest_text:String(s.rest_text||"").trim()||null,
+    raw_text:raw||null,
+    set_count:null,
+    is_skip:false,
+    is_deload:false,
+    notes:s.notes||null,
+    prescription:{source:"manual_series_builder",shape:"block_week_exercise_series"}
+  };
 }
-function markPlannedSets(sets,sig){return sets.map(s=>({...s,_planSig:sig}))}
-function countSets(row){const n=parseInt(String(row.sets_text||"").match(/\d+/)?.[0]||"",10);return Number.isFinite(n)&&n>0?n:1}
-function defaultSets(row,sess=currentSession()){
-  const sig=plannedSignature(row,sess);
-  const rx=progressionFor(row,sess.week);
-  if(rx.length)return markPlannedSets(rx.map((p,i)=>({id:uid(),note:formatProgressionSet(p),kg:String(p.load_text||money(p.kg)||""),reps:String(p.reps_text||""),rpe:"",done:false,freeNote:"",rest:p.rest_text||row.rest_text||""})),sig);
-  const mode=rowMode(row,sess);
-  if(mode==="time")return markPlannedSets([{id:uid(),note:"Czas",kg:String(row.load_text||""),reps:String(row.reps_text||""),rpe:"",done:false,freeNote:""}],sig);
-  if(mode==="done")return markPlannedSets([{id:uid(),note:"Wykonane",kg:"",reps:String(row.reps_text||""),rpe:"",done:false,freeNote:""}],sig);
-  return markPlannedSets(Array.from({length:countSets(row)},(_,i)=>({id:uid(),note:`Seria ${i+1}`,kg:String(row.load_text||money(row.weight)||""),reps:String(row.reps_text||""),rpe:"",done:false,freeNote:""})),sig);
+
+async function addResource(){
+  const currentPlan=getCurrentPlan();
+  const label=document.getElementById("resLabel").value.trim();
+  if(!label){showToast("Podaj nazwę materiału");return;}
+  const row={plan_id:currentPlan.id,label,url:document.getElementById("resUrl").value.trim()||null,resource_type:document.getElementById("resType").value,notes:document.getElementById("resNotes").value.trim()||null};
+  try{const {error}=await sb.from("plan_resources").insert(row);if(error)throw error;await loadPlan(currentPlan.id);STATE.tab="resources";render();}catch(err){setError(err);}
 }
-function dbLogsFor(row,sess=currentSession()){
-  const db=dbForSession(sess);if(!db)return[];
-  const rowName=norm(sourceName(row)), rowNo=String(row.exercise_no||"");
-  return app.setLogs.filter(l=>l.workout_session_id===db.id&&(String(l.exercise_no||"")===rowNo||norm(l.exercise_name)===rowName)).sort((a,b)=>(a.set_no||0)-(b.set_no||0));
+async function deleteResource(id){
+  if(!confirm("Usunąć materiał?"))return;
+  try{const {error}=await sb.from("plan_resources").delete().eq("id",id);if(error)throw error;await loadPlan(getCurrentPlan().id);STATE.tab="resources";render();}catch(err){setError(err);}
 }
-function setsFor(row,sess=currentSession()){
-  if(isDbDone(sess)){
-    const logs=dbLogsFor(row,sess);
-    if(logs.length)return logs.map(l=>({id:l.id,note:l.planned_label||`Seria ${l.set_no}`,kg:String(l.kg??""),reps:String(l.reps_text||""),rpe:String(l.rpe??""),done:!!l.done,freeNote:l.note||""}));
-  }
-  const key=exerciseKey(row,sess);
-  const sig=plannedSignature(row,sess), existing=app.draft.logs[key];
-  if(!existing||needsPlanRefresh(existing,sig))app.draft.logs[key]=defaultSets(row,sess);
-  return app.draft.logs[key];
+
+async function assignSelectedAthlete(){
+  const currentPlan=getCurrentPlan();
+  const athleteId=document.getElementById("assignAthlete").value;
+  if(!athleteId){showToast("Wybierz podopiecznego");return;}
+  try{const {error}=await sb.from("plan_athletes").upsert({plan_id:currentPlan.id,athlete_id:athleteId},{onConflict:"plan_id,athlete_id"});if(error)throw error;await loadPlan(currentPlan.id);}catch(err){setError(err);}
 }
-function needsPlanRefresh(sets,sig){
-  if(!Array.isArray(sets)||!sets.length)return true;
-  if(sets[0]?._planSig===sig)return false;
-  return !sets.some(s=>s.done||String(s.rpe||"").trim()||String(s.freeNote||"").trim());
-}
-function skipFor(row,sess=currentSession()){return app.draft.skips[exerciseKey(row,sess)]||null}
-function exerciseDone(row,sess=currentSession()){if(isDbDone(sess))return true;if(skipFor(row,sess))return true;const sets=setsFor(row,sess);return sets.length&&sets.every(s=>s.done)}
-function workoutForSession(sess=currentSession()){return workoutByNum(sess?.workoutNum)}
-function sessionDone(sess=currentSession()){if(isDbDone(sess))return true;const w=workoutForSession(sess);return !!w?.exercises?.length&&w.exercises.every(row=>exerciseDone(row,sess))}
-function sessionProgress(sess=currentSession()){
-  const db=dbForSession(sess);if(db&&Number(db.total_exercises)>0)return Math.min(100,Math.round(Number(db.completed_exercises||0)/Number(db.total_exercises)*100));
-  const w=workoutForSession(sess);if(!w?.exercises?.length)return 0;
-  return Math.round(w.exercises.filter(row=>exerciseDone(row,sess)).length/w.exercises.length*100);
-}
-function sessionStatus(sess){if(isDbDone(sess))return"done";if(sessionDone(sess))return"local";const next=nextPendingSession();return next&&next.id===sess.id?"due":"future"}
-function nextPendingSession(){return schedule().find(s=>!sessionDone(s))||null}
-function overallProgress(){const s=schedule();return s.length?Math.round(s.filter(x=>sessionDone(x)).length/s.length*100):0}
-function currentPlanStats(){const s=schedule(),done=s.filter(x=>sessionDone(x)).length,next=nextPendingSession();return{done,total:s.length,progress:overallProgress(),nextWeek:next?.week||"-",nextWorkout:next?.workoutNum||"-"}}
-function setView(v){app.view=v;if(v!=="train")app.mode="calendar";render();scrollToTop()}
-function setSession(id){const sess=schedule().find(s=>s.id===id);if(!sess)return;app.activeSessionId=sess.id;app.mode="session";app.view="train";app.exerciseIndex=0;app.previewWeek=sess.week;render();scrollToTop()}
-function exitSession(){app.mode="calendar";render();scrollToTop()}
-function setExerciseMode(mode){const row=exercise();app.draft.modeOverrides[row.id]=mode;delete app.draft.logs[exerciseKey(row,currentSession())];saveDraft();render()}
-function workout(){return workoutForSession(currentSession())}
-function exercise(){const w=workout();return w.exercises[Math.min(app.exerciseIndex,Math.max(0,w.exercises.length-1))]||{}}
-function render(){
-  $("tabs").classList.toggle("hidden",!app.athlete||!app.plan);
-  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===app.view));
-  setStatus(app.status,app.statusKind);
-  if(!app.athlete||!app.plan)return renderClientSelect();
-  const sess=currentSession(),w=workoutForSession(sess);
-  if(app.view==="train"&&app.mode==="session")header(`${w?.name||"Trening"} · tydz. ${sess.week}`,`Ćwiczenie ${app.exerciseIndex+1}/${Math.max(1,w?.exercises?.length||0)} · ${isDbDone(sess)?"zapisany w Supabase":"wykonanie treningu"}`);
-  else header(app.view==="plan"?"Rozpiska planu":app.view==="measure"?"Pomiary":app.view==="history"?"Log treningowy":app.view==="client"?"Podopieczny":"Postęp planu",`${app.athlete.name} · ${app.plan.name} · ${app.plan.weeks} tyg.`);
-  $("progressBar").style.width=`${app.view==="train"&&app.mode==="session"?sessionProgress(sess):overallProgress()}%`;
-  if(app.view==="train"&&app.mode==="calendar")renderCalendar();
-  if(app.view==="train"&&app.mode==="session")renderSession();
-  if(app.view==="plan")renderPlan();
-  if(app.view==="measure")renderMeasurements();
-  if(app.view==="history")renderHistory();
-  if(app.view==="client")renderClient();
-  saveDraft();
-}
-function header(t,s){$("headerTitle").textContent=t;$("headerSub").textContent=s}
-function renderClientSelect(){
-  header("Wybierz podopiecznego","Publiczna lista testowa");
-  $("progressBar").style.width="0%";
-  const items=app.athletes.map(a=>`<a class="clientBtn" href="${clientHref(a.client_key)}"><strong>${esc(a.name||a.client_key)}</strong><small>${esc(a.client_key)} · ${esc(a.status||"active")}</small></a>`).join("");
-  $("view").innerHTML=`<section class="card"><h2>Podopieczni</h2><div class="subtitle" style="margin-bottom:12px">Wybierz profil. Po wyborze MonkeyPanel załaduje aktywny plan z Supabase.</div><div class="list">${items||`<div class="empty">Brak podopiecznych.</div>`}</div></section>`;
-}
-function clientHref(clientKey){
-  const url=new URL(location.href);
-  url.search="";
-  url.hash="";
-  url.searchParams.set("client",clientKey);
-  return `${url.pathname}${url.search}`;
-}
-function renderCalendar(){
-  const st=currentPlanStats(),s=schedule(),next=nextPendingSession();
-  const groups=Map.groupBy?Map.groupBy(s,x=>x.week):s.reduce((m,x)=>(m[x.week] ||= [],m[x.week].push(x),m),{});
-  const entries=groups instanceof Map?[...groups.entries()]:Object.entries(groups).map(([k,v])=>[Number(k),v]);
-  $("view").innerHTML=`<div class="summary"><div class="kpi"><strong>${st.done}</strong><span class="subtitle">zapisane</span></div><div class="kpi"><strong>${st.total}</strong><span class="subtitle">sesje</span></div><div class="kpi"><strong>${st.progress}%</strong><span class="subtitle">postęp</span></div></div><div class="legend"><span>zielone: zapisane</span><span>złote: następne</span><span>niebieskie: gotowe lokalnie</span></div><div class="calendar">${entries.map(([week,items])=>`<section class="weekCard"><div class="weekHead"><h2>Tydzień ${week}</h2><span class="pill">${week===next?.week?"aktywny":items.every(sessionDone)?"ukończony":"plan"}</span></div><div class="days">${items.map(dayButtonHTML).join("")}</div>${weekNotes(week)}</section>`).join("")}</div>`;
-}
-function dayButtonHTML(sess){
-  const status=sessionStatus(sess),db=dbForSession(sess),label=status==="done"?"zapisany":status==="local"?"gotowy":status==="due"?"następny":"plan";
-  return `<button class="dayBtn status-${status}" onclick="setSession('${sess.id}')"><div class="date">${esc(dateLabel(db?.performed_date||sess.date))}</div><div class="name">${esc(sess.workoutName||workoutByNum(sess.workoutNum)?.name||`${sess.workoutNum} TRENING`)}</div><div class="subtitle">T${sess.week} · ${label}</div><div class="bar"><div style="width:${sessionProgress(sess)}%"></div></div></button>`;
-}
-function weekNotes(week){const blocks=app.blocks.filter(b=>Number(b.start_week)<=week&&Number(b.end_week)>=week);const notes=app.weekNotes.filter(n=>Number(n.week_number)===week&&blocks.some(b=>b.id===n.block_id)).map(n=>n.notes).filter(Boolean);return notes.length?`<div class="note"><strong>Notatka tygodnia</strong><br>${notes.map(esc).join("<br>")}</div>`:""}
-function renderSession(){
-  const sess=currentSession(),w=workoutForSession(sess),row=exercise();
-  if(!w){$("view").innerHTML=`<section class="card"><div class="empty">Brak treningu.</div></section>`;return}
-  if(sessionDone(sess)){$("view").innerHTML=finishHTML(sess);return}
-  const mode=rowMode(row,sess),sets=setsFor(row,sess),skipped=skipFor(row,sess),rx=progressionFor(row,sess.week);
-  $("view").innerHTML=`<section class="card"><div class="exerciseNav"><button class="btn secondary" onclick="exitSession()">← Kalendarz</button><button class="btn secondary navMini" onclick="prevExercise()" ${app.exerciseIndex===0?"disabled":""}>‹</button><button class="btn secondary navMini" onclick="nextExercise()" ${app.exerciseIndex>=w.exercises.length-1?"disabled":""}>›</button></div><div class="exerciseTop"><div><div class="subtitle">Ćwiczenie ${app.exerciseIndex+1}/${w.exercises.length}</div><div class="exercise-title">${esc(sourceName(row))}</div></div><span class="pill">${modeLabel(mode)}</span></div><div class="exerciseProgress">${w.exercises.map((r,i)=>`<div class="dot ${exerciseDone(r,sess)?"done":i===app.exerciseIndex?"current":""}"></div>`).join("")}</div><div class="stats"><div class="stat"><small>Serie</small><strong>${esc(row.sets_text||sets.length||"-")}</strong></div><div class="stat"><small>Powt.</small><strong>${esc(row.reps_text||"-")}</strong></div><div class="stat"><small>Przerwa</small><strong>${esc(row.rest_text||"-")}</strong></div></div>${modeSwitchHTML(mode)}${videoBlock(row)}${rx.length?`<div class="note"><strong>Rozpiska tygodnia ${sess.week}</strong><div class="rxLine">${rx.map(s=>`<span class="rxPill gold">${esc(formatProgressionSet(s))}</span>`).join("")}</div></div>`:""}<div class="note"><strong>Uwagi trenera</strong><br>${esc(row.notes||"Brak uwag")}</div>${skipped?`<div class="note" style="border:1px solid #92400e"><strong>Ćwiczenie pominięte</strong><br>${esc(skipped.reason)}</div>`:modeCompletionHTML(row,mode,sets)}${mode==="sets"&&!skipped?`<div class="actions"><button class="btn secondary" onclick="addSet()">+ Seria</button><button class="btn secondary" onclick="removeSet()">− Usuń</button></div>`:""}<div class="actions"><button class="btn secondary" onclick="skipExercise()">Pomiń ćwiczenie</button><button class="btn secondary" onclick="unskipExercise()">Cofnij pominięcie</button></div><textarea class="sessionNote" placeholder="Notatka do całego treningu" oninput="app.draft.sessionNotes[sessionKey()] = this.value; saveDraft()">${esc(app.draft.sessionNotes[sessionKey()]||"")}</textarea></section>`;
-}
-function modeLabel(mode){return mode==="time"?"czas":mode==="done"?"wykonane":"serie"}
-function modeSwitchHTML(mode){return `<div class="actions" style="grid-template-columns:repeat(3,1fr);margin:10px 0"><button class="btn ${mode==="sets"?"":"secondary"}" onclick="setExerciseMode('sets')">Serie</button><button class="btn ${mode==="time"?"":"secondary"}" onclick="setExerciseMode('time')">Czas</button><button class="btn ${mode==="done"?"":"secondary"}" onclick="setExerciseMode('done')">Wykonane</button></div>`}
-function videoBlock(row){const url=row.exercises?.youtube_url||"";if(!url)return"";const id=String(url).match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{6,})/)?.[1];return id?`<div class="embed"><iframe src="https://www.youtube.com/embed/${esc(id)}" allowfullscreen></iframe></div>`:`<a class="btn secondary full" href="${esc(url)}" target="_blank" rel="noreferrer">Otwórz film</a>`}
-function setHTML(row,set,i,sets){
-  return `<div class="set ${set.done?"done":""}"><div class="doneCompact"><strong>${esc(set.note)}</strong><button class="btn tiny secondary" onclick="toggleSet('${row.id}','${set.id}')">Edytuj</button></div><div class="openSet"><div class="set-head"><span>${i+1}. ${esc(set.note)}</span><button class="btn tiny ${set.done?"secondary":"good"}" onclick="toggleSet('${row.id}','${set.id}')">${set.done?"Cofnij":"Zrobione"}</button></div><div class="inputs"><label class="small">kg<input inputmode="decimal" value="${esc(set.kg)}" oninput="updateSet('${row.id}','${set.id}','kg',this.value)"></label><label class="small">powt.<input inputmode="decimal" value="${esc(set.reps)}" oninput="updateSet('${row.id}','${set.id}','reps',this.value)"></label><label class="small">RPE<input inputmode="decimal" value="${esc(set.rpe)}" oninput="updateSet('${row.id}','${set.id}','rpe',this.value)"></label></div><textarea style="margin-top:8px" placeholder="Notatka do serii" oninput="updateSet('${row.id}','${set.id}','freeNote',this.value)">${esc(set.freeNote||"")}</textarea></div></div>`;
-}
-function modeCompletionHTML(row,mode,sets){
-  if(mode==="sets")return sets.map((set,i)=>setHTML(row,set,i,sets)).join("");
-  const set=sets[0]||defaultSets(row,currentSession())[0],title=mode==="time"?"Wykonanie na czas":"Ćwiczenie do wykonania";
-  const detail=mode==="time"?`<label class="small">czas / wynik<input value="${esc(set.reps)}" oninput="updateSet('${row.id}','${set.id}','reps',this.value)"></label>`:`<div class="subtitle">${esc(row.reps_text&&row.reps_text!=="-"?row.reps_text:"Oznacz ćwiczenie jako wykonane.")}</div>`;
-  return `<div class="set ${set.done?"done":""}"><div class="set-head"><span>${title}</span><button class="btn tiny ${set.done?"secondary":"good"}" onclick="toggleSet('${row.id}','${set.id}')">${set.done?"Cofnij":"Zrobione"}</button></div>${detail}<textarea style="margin-top:8px" placeholder="Notatka do ćwiczenia" oninput="updateSet('${row.id}','${set.id}','freeNote',this.value)">${esc(set.freeNote||"")}</textarea></div>`;
-}
-function updateSet(rowId,setId,field,value){const row=app.trainingExercises.find(r=>r.id===rowId);const s=setsFor(row).find(x=>x.id===setId);if(s)s[field]=value;saveDraft()}
-function toggleSet(rowId,setId){const row=app.trainingExercises.find(r=>r.id===rowId),s=setsFor(row).find(x=>x.id===setId);if(!s)return;s.done=!s.done;render();if(s.done&&exerciseDone(row))celebrateNext()}
-function addSet(){const row=exercise(),sets=setsFor(row);sets.push({id:uid(),note:`Seria ${sets.length+1}`,kg:"",reps:String(row.reps_text||""),rpe:"",done:false,freeNote:""});render()}
-function removeSet(){const row=exercise(),sets=setsFor(row);if(sets.length>1)sets.pop();render()}
-function skipExercise(){const reason=prompt("Dlaczego pomijasz ćwiczenie? Wpisz krótką notatkę dla trenera.");if(!reason||!reason.trim())return showToast("Notatka jest wymagana");app.draft.skips[exerciseKey(exercise(),currentSession())]={reason:reason.trim(),at:new Date().toISOString()};render()}
-function unskipExercise(){delete app.draft.skips[exerciseKey(exercise(),currentSession())];render()}
-function nextExercise(){const w=workout();app.exerciseIndex=Math.min(w.exercises.length-1,app.exerciseIndex+1);render();scrollToTop()}
-function prevExercise(){app.exerciseIndex=Math.max(0,app.exerciseIndex-1);render();scrollToTop()}
-function celebrateNext(){const w=workout();if(app.exerciseIndex>=w.exercises.length-1){showToast("Trening gotowy do zapisu");render();return}app.exerciseIndex++;showToast("Ćwiczenie zrobione");render();scrollToTop()}
-function finishHTML(sess){
-  const w=workoutForSession(sess),saved=isDbDone(sess);
-  const items=w.exercises.map(row=>summaryForExercise(row,sess)).join("");
-  return `<section class="finishScreen"><div class="finishHero"><h2>${saved?"Trening zapisany":"Dobra robota!"}</h2><div class="subtitle">${saved?"Ten trening jest już w Supabase.":"Trening wykonany. Zapisz go do Supabase, żeby trener widział raport."}</div></div><div class="list">${items}</div><textarea class="sessionNote" placeholder="Notatka do całego treningu" oninput="app.draft.sessionNotes[sessionKey(sess)] = this.value; saveDraft()">${esc(app.draft.sessionNotes[sessionKey(sess)]||dbForSession(sess)?.session_note||"")}</textarea><div class="actions"><button class="btn secondary" onclick="exitSession()">Kalendarz</button>${saved?`<button class="btn secondary" onclick="reloadCurrent()">Odśwież</button>`:`<button class="btn good" onclick="saveWorkout('${sess.id}')">Zapisz do Supabase</button>`}</div></section>`;
-}
-function summaryForExercise(row,sess){
-  const skip=skipFor(row,sess),sets=setsFor(row,sess);
-  return `<div class="doneItem"><strong>${skip?"⚠️":"✅"} ${esc(sourceName(row))}</strong><div class="subtitle">${skip?`Pominięte: ${esc(skip.reason)}`:sets.map(formatSetSummary).join(" / ")||"brak serii"}</div></div>`;
-}
-function formatSetSummary(s){return `${esc(s.kg||"-")}${s.kg?"kg":""} × ${esc(s.reps||"-")}${s.rpe?` · RPE ${esc(s.rpe)}`:""}` }
-async function saveWorkout(sessionId){
-  const sess=schedule().find(s=>s.id===sessionId)||currentSession(),w=workoutForSession(sess);
-  const completed=w.exercises.filter(row=>exerciseDone(row,sess)).length,total=w.exercises.length;
-  const payload={athlete_id:app.athlete.id,plan_id:app.plan.id,source_plan_key:app.sourcePlanKey,client_key:app.athlete.client_key,session_id:sess.id,workout_date:sess.date,performed_date:todayISO(),week_number:sess.week,workout_id:String(sess.workoutNum),workout_name:w.name,status:completed>=total?"done":"partial",completed_exercises:completed,total_exercises:total,session_note:app.draft.sessionNotes[sessionKey(sess)]||null,recorded_at:new Date().toISOString()};
+async function createAthleteFromPrompt(){
+  const key=prompt("client_key podopiecznego, np. gabriel");
+  if(!key)return;
+  const name=prompt("Nazwa / imię",key)||key;
   try{
-    showToast("Zapisywanie treningu…");
-    const {data,error}=await sb.from("workout_sessions").upsert(payload,{onConflict:"athlete_id,source_plan_key,session_id"}).select("id").single();
+    const {data,error}=await sb.from("athletes").upsert({client_key:slugify(key),name:name.trim(),status:"active"},{onConflict:"client_key"}).select("id").single();
     if(error)throw error;
-    const workoutSessionId=data.id;
-    const del=await sb.from("workout_set_logs").delete().eq("workout_session_id",workoutSessionId);
-    if(del.error)throw del.error;
-    const rows=[];
-    for(const row of w.exercises){
-      const skip=skipFor(row,sess);
-      if(skip){
-        rows.push(setLogPayload(workoutSessionId,sess,row,{note:`Pominięte: ${skip.reason}`,set_no:1,planned_label:"Pominięte",done:true}));
+    await Promise.all([loadAthletes(),loadAthleteAssignments()]);
+    if(data?.id)STATE.selectedAthleteId=data.id;
+    render();
+  }catch(err){setError(err);}
+}
+
+/* =========================
+   ATHLETES
+========================= */
+function renderAthletes(){
+  const selected=STATE.athletes.find(a=>a.id===STATE.selectedAthleteId)||STATE.athletes[0]||null;
+  if(selected&&!STATE.selectedAthleteId)STATE.selectedAthleteId=selected.id;
+  document.getElementById("main").innerHTML=`
+    <div class="topbar">
+      <div><div class="eyebrow">Supabase</div><div class="title">Podopieczni</div>${statusHTML()}</div>
+      <div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="createAthleteFromPrompt()">Nowy podopieczny</button><button class="btn" onclick="saveAthletes()">Zapisz podopiecznych</button></div>
+    </div>
+    ${selected?athleteDetailHTML(selected):`<div class="empty">Dodaj albo wybierz podopiecznego.</div>`}`;
+}
+
+function athleteCardHTML(a){
+  const links=getAthleteLinks(a.id);
+  return `<button class="athleteCard ${a.id===STATE.selectedAthleteId?"active":""}" onclick="selectAthlete('${a.id}')">
+    <div class="athleteName">${esc(a.name)}</div>
+    <div class="small">${esc(a.client_key)} · ${esc(a.status||"active")}</div>
+    <div style="margin-top:8px"><span class="pill blue">${links.length} planów</span>${activeAthletePlan(a.id)?`<span class="pill good">aktywny</span>`:""}</div>
+  </button>`;
+}
+
+function athleteDetailHTML(a){
+  const links=getAthleteLinks(a.id);
+  const unassigned=STATE.plans.filter(p=>!links.some(l=>l.plan_id===p.id));
+  const tab=STATE.athleteTab||"profile";
+  return `<div class="athleteWorkspace">
+    ${athleteToolbarHTML(a,links)}
+    ${athleteSummaryHTML(a)}
+    <div class="athleteTabs">
+      <button class="tab ${tab==="profile"?"active":""}" onclick="setAthleteTab('profile')">Profil</button>
+      <button class="tab ${tab==="history"?"active":""}" onclick="setAthleteTab('history')">Historia treningów</button>
+      <button class="tab ${tab==="measurements"?"active":""}" onclick="setAthleteTab('measurements')">Pomiary</button>
+      <button class="tab ${tab==="preview"?"active":""}" onclick="setAthleteTab('preview')">Podgląd planu</button>
+    </div>
+    <div class="tabPane">
+      ${tab==="history"?athleteHistoryHTML(a):tab==="measurements"?athleteMeasurementsHTML(a):tab==="preview"?athletePreviewHTML(a):athleteProfileHTML(a,links,unassigned)}
+    </div>
+  </div>`;
+}
+
+function athleteToolbarHTML(a,links){
+  const selectedPlanId=STATE.athletePreview?.athleteId===a.id?STATE.athletePreview.plan?.id:(activeAthletePlan(a.id)?.plan_id||links[0]?.plan_id||"");
+  const planSelectId=`athletePlanSelect_${a.id}`;
+  return `<div class="section athleteToolbar">
+    <div class="field"><label>Podopieczny</label><select onchange="selectAthlete(this.value)">${STATE.athletes.map(row=>`<option value="${row.id}" ${row.id===a.id?"selected":""}>${esc(row.name)} · ${esc(row.client_key)}</option>`).join("")}</select></div>
+    <div class="field"><label>Plan</label><select id="${planSelectId}" onchange="if(this.value)loadAthletePreview('${a.id}',this.value)" ${links.length?"":"disabled"}><option value="">${links.length?"Wybierz plan":"Brak przypisanych planów"}</option>${links.map(link=>{
+      const p=link.plans||STATE.plans.find(plan=>plan.id===link.plan_id)||{};
+      return `<option value="${link.plan_id}" ${link.plan_id===selectedPlanId?"selected":""}>${esc(p.name||link.plan_id)} · ${esc(p.status||"")} · ${esc(p.start_date||"-")}</option>`;
+    }).join("")}</select></div>
+    <div class="btnRow"><button class="btn secondary" onclick="loadSelectedAthletePlan('${a.id}','${planSelectId}')" ${links.length?"":"disabled"}>Załaduj plan</button></div>
+  </div>`;
+}
+
+function athleteProfileHTML(a,links,unassigned){
+  return `<div class="section">
+    <div class="athleteProfileHeader">
+      <div>
+        <div class="sectionTitle" style="margin-bottom:4px">${esc(a.name)}</div>
+        <div class="small">client_key: <strong>${esc(a.client_key)}</strong> · ${links.length} przypisanych planów</div>
+      </div>
+      <div class="btnRow"><button class="btn secondary" onclick="copyClientKey('${esc(a.client_key)}')">Kopiuj client_key</button></div>
+    </div>
+    <div class="profileFields">
+      <div class="field"><label>Imię / nazwa</label><input value="${esc(a.name||"")}" oninput="updateAthlete('${a.id}','name',this.value)"></div>
+      <div class="field"><label>client_key</label><input value="${esc(a.client_key||"")}" oninput="updateAthlete('${a.id}','client_key',this.value.toLowerCase())"></div>
+      <div class="field"><label>Status</label><select onchange="updateAthlete('${a.id}','status',this.value)"><option value="active" ${a.status==="active"?"selected":""}>active</option><option value="paused" ${a.status==="paused"?"selected":""}>paused</option><option value="archived" ${a.status==="archived"?"selected":""}>archived</option></select></div>
+      <div class="field"><label>Notatki</label><input value="${esc(a.notes||"")}" oninput="updateAthlete('${a.id}','notes',this.value)"></div>
+    </div>
+  </div>${athletePlansHTML(a,links,unassigned)}`;
+}
+
+function athletePlansHTML(a,links,unassigned){
+  return `<div class="section">
+    <div class="sectionTitle">Plany podopiecznego</div>
+    ${links.map(link=>athletePlanRowHTML(a,link)).join("")||`<div class="empty">Brak przypisanych planów.</div>`}
+    <div class="grid2" style="margin-top:12px">
+      <div class="field"><label>Przypisz kolejny plan</label><select id="assignPlan_${a.id}"><option value="">Wybierz nieprzypisany plan</option>${unassigned.map(p=>`<option value="${p.id}">${esc(p.name)} · ${esc(p.status)} · ${esc(p.weeks)} tyg.</option>`).join("")}</select></div>
+      <button class="btn secondary" onclick="assignExistingPlanToAthlete('${a.id}')">Przypisz plan</button>
+    </div>
+  </div>`;
+}
+
+function previewPlanPickerHTML(a,context){
+  const links=getAthleteLinks(a.id);
+  if(!links.length)return "";
+  const selectedPlanId=STATE.athletePreview?.athleteId===a.id?STATE.athletePreview.plan?.id:(activeAthletePlan(a.id)?.plan_id||links[0]?.plan_id);
+  const selectId=`${context}_${a.id}`;
+  return `<div class="previewPicker">
+    <div class="field">
+      <label>Plan do historii i podglądu</label>
+      <select id="${selectId}" onchange="if(this.value)loadAthletePreview('${a.id}',this.value)">
+        ${links.map(link=>{
+          const p=link.plans||STATE.plans.find(plan=>plan.id===link.plan_id)||{};
+          return `<option value="${link.plan_id}" ${link.plan_id===selectedPlanId?"selected":""}>${esc(p.name||link.plan_id)} · ${esc(p.status||"")} · ${esc(p.start_date||"-")}</option>`;
+        }).join("")}
+      </select>
+    </div>
+    <button class="btn good" onclick="loadSelectedAthletePlan('${a.id}','${selectId}')">Pokaż historię i podgląd</button>
+  </div>`;
+}
+
+function athleteSummaryHTML(a){
+  const preview=STATE.athletePreview;
+  if(!preview||preview.athleteId!==a.id)return "";
+  const sessions=preview.workoutSessions||[];
+  const setLogs=preview.workoutSetLogs||[];
+  const measurements=preview.measurements||[];
+  const latestSession=[...sessions].sort((x,y)=>String(y.workout_date||"").localeCompare(String(x.workout_date||"")))[0];
+  const latestMeasurement=[...measurements].sort((x,y)=>String(y.measurement_date||"").localeCompare(String(x.measurement_date||"")))[0];
+  return `<div class="metricStrip">
+    <div class="metricCard"><div class="metricLabel">Treningi</div><div class="metricValue">${sessions.length}</div><div class="small">${latestSession?`ostatni ${esc(shortDate(latestSession.workout_date))}`:"brak historii"}</div></div>
+    <div class="metricCard"><div class="metricLabel">Serie</div><div class="metricValue">${setLogs.filter(l=>l.done).length}</div><div class="small">zapisane przez MonkeyPanel</div></div>
+    <div class="metricCard"><div class="metricLabel">Pomiary</div><div class="metricValue">${measurements.length}</div><div class="small">${latestMeasurement?`ostatni ${esc(shortDate(latestMeasurement.measurement_date))}`:"brak pomiarów"}</div></div>
+    <div class="metricCard"><div class="metricLabel">Plan</div><div class="metricValue" style="font-size:16px">${esc(preview.plan.name)}</div><div class="small">${esc(preview.plan.status||"")} · ${esc(preview.plan.weeks||"-")} tyg.</div></div>
+  </div>`;
+}
+
+function athletePlanRowHTML(a,link){
+  const p=link.plans||STATE.plans.find(plan=>plan.id===link.plan_id)||{};
+  return `<div class="planRow">
+    <div>
+      <strong>${esc(p.name||link.plan_id)}</strong>
+      <div class="small">${esc(p.status||"")} · start ${esc(p.start_date||"-")} · ${esc(p.weeks||"-")} tyg. · ${esc(p.slug||"")}</div>
+    </div>
+    <div class="btnRow">
+      <button class="btn secondary" onclick="loadPlan('${link.plan_id}')">Edytuj</button>
+      <button class="btn good" onclick="openAthletePlan('${a.id}','${link.plan_id}','preview')">Podgląd klienta</button>
+      <button class="btn danger" onclick="unassignPlanFromAthlete('${a.id}','${link.plan_id}')">Odepnij</button>
+    </div>
+  </div>`;
+}
+
+function athleteHistoryHTML(a){
+  const preview=STATE.athletePreview;
+  if(!preview||preview.athleteId!==a.id)return `<div class="section"><div class="sectionTitle">Historia treningów</div><div class="panelNotice">Wybierz plan w selektorze nad zakładkami, żeby załadować treningi.</div></div>`;
+  const sessions=preview.workoutSessions||[];
+  const setLogs=preview.workoutSetLogs||[];
+  return `<div class="section" style="margin-top:14px">
+    <div class="detailHead">
+      <div><div class="sectionTitle" style="margin-bottom:4px">Historia treningów</div><div class="small">${esc(preview.plan.name)} · ${sessions.length} treningów · ${setLogs.length} serii</div></div>
+      <div class="historyStats">
+        <span class="pill blue">${sessions.length} sesji</span>
+        <span class="pill good">${setLogs.filter(l=>l.done).length} wykonanych serii</span>
+      </div>
+    </div>
+    ${workoutHistoryHTML(preview)}
+  </div>`;
+}
+
+function athleteMeasurementsHTML(a){
+  const preview=STATE.athletePreview;
+  if(!preview||preview.athleteId!==a.id)return `<div class="section"><div class="sectionTitle">Pomiary</div><div class="panelNotice">Wybierz plan w selektorze nad zakładkami, żeby załadować pomiary.</div></div>`;
+  return `<div class="section" style="margin-top:14px">${measurementHistoryHTML(preview)}</div>`;
+}
+
+function workoutHistoryHTML(preview){
+  const sessions=[...(preview.workoutSessions||[])].sort((a,b)=>String(b.workout_date||"").localeCompare(String(a.workout_date||""))||String(b.workout_id||"").localeCompare(String(a.workout_id||"")));
+  if(!sessions.length)return `<div class="historyPanel"><div class="historyTitle">Wykonane treningi</div><div class="empty">Brak zapisanych treningów dla tego planu.</div></div>`;
+  const selectedId=STATE.selectedWorkoutSessionId&&sessions.some(s=>s.id===STATE.selectedWorkoutSessionId)?STATE.selectedWorkoutSessionId:sessions[0].id;
+  return `<div class="historyPanel">
+    <div class="historyTitle">Wykonane treningi</div>
+    <div class="tableWrap">
+      <table class="dataTable sessionsTable">
+        <thead><tr><th>Data</th><th>Tydz.</th><th>Trening</th><th>Status</th><th>Ćwiczenia</th><th>Śr. RPE</th><th>Serie</th><th>Notatka</th><th></th></tr></thead>
+        <tbody>${sessions.map(s=>sessionHistoryRowHTML(preview,s,selectedId)).join("")}</tbody>
+      </table>
+    </div>
+    ${sessionDetailsPanelHTML(preview,selectedId)}
+  </div>`;
+}
+
+function sessionHistoryRowHTML(preview,s,selectedId){
+  const logs=workoutLogsForSession(preview,s.id);
+  const doneSets=logs.filter(l=>l.done).length;
+  const exercises=new Set(logs.map(l=>`${l.exercise_no||""}|${l.exercise_name||""}`)).size;
+  const completed=s.completed_exercises??exercises;
+  const total=s.total_exercises??exercises;
+  const note=s.session_note||logs.map(l=>l.note).find(Boolean)||"";
+  return `<tr class="${s.id===selectedId?"sessionRowActive":""}">
+    <td>${esc(shortDate(s.performed_date||s.workout_date))}</td>
+    <td>${esc(s.week_number||"-")}</td>
+    <td><strong>${esc(s.workout_name||s.workout_id||s.session_id)}</strong><div class="small">${esc(s.session_id||"")}</div></td>
+    <td><span class="pill good">${esc(statusLabel(s.status))}</span></td>
+    <td>${esc(completed)}/${esc(total)}</td>
+    <td>${esc(avgRpe(logs))}</td>
+    <td>${doneSets} serii</td>
+    <td>${esc(note||"-")}</td>
+    <td class="tableActionCell"><button class="miniBtn" onclick="selectWorkoutSession('${s.id}')">Pokaż szczegóły</button></td>
+  </tr>`;
+}
+
+function sessionDetailsPanelHTML(preview,sessionId){
+  const session=(preview.workoutSessions||[]).find(s=>s.id===sessionId);
+  if(!session)return `<div class="sessionDetailsPanel panelNotice">Wybierz trening, żeby zobaczyć zapisane serie.</div>`;
+  const logs=workoutLogsForSession(preview,sessionId);
+  return `<div class="sessionDetailsPanel">
+    <div class="historyTitle">Szczegóły: ${esc(session.workout_name||session.workout_id||session.session_id)} <span class="small">· ${esc(shortDate(session.performed_date||session.workout_date))}</span></div>
+    ${setLogTableHTML(logs)}
+  </div>`;
+}
+
+function setLogTableHTML(logs){
+  if(!logs.length)return `<div class="small" style="margin-top:8px">Brak serii.</div>`;
+  return `<div class="setLogBox"><table class="setLogTable">
+    <thead><tr><th>Exercise</th><th>Set</th><th>Planned</th><th>Kg</th><th>Reps</th><th>RPE</th><th>Note</th></tr></thead>
+    <tbody>${logs.map(l=>`<tr>
+      <td><strong>${esc(l.exercise_no||"")}</strong> ${esc(l.exercise_name||"")}</td>
+      <td>${esc(l.set_no||"-")}</td>
+      <td>${esc(l.planned_label||"-")}</td>
+      <td>${esc(metric(l.kg))}</td>
+      <td>${esc(l.reps_text||"-")}</td>
+      <td>${esc(metric(l.rpe))}</td>
+      <td>${esc(l.note||"-")}</td>
+    </tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
+function measurementHistoryHTML(preview){
+  const rows=[...(preview.measurements||[])].sort((a,b)=>String(b.measurement_date||"").localeCompare(String(a.measurement_date||"")));
+  if(!rows.length)return `<div class="historyPanel"><div class="historyTitle">Pomiary</div><div class="empty">Brak pomiarów dla tego planu.</div></div>`;
+  return `<div class="historyPanel">
+    <div class="historyTitle">Pomiary</div>
+    <div class="tableWrap">
+      <table class="dataTable compact">
+        <thead><tr><th>Data</th><th>Tydz.</th><th>Waga</th><th>Udo</th><th>Dupa</th><th>Brzuch</th><th>Klatka</th><th>Biceps</th><th>Szyja</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr>
+          <td>${esc(shortDate(r.measurement_date))}</td>
+          <td>${esc(r.week_number||"-")}</td>
+          <td>${esc(metric(r.waga))}</td>
+          <td>${esc(metric(r.udo))}</td>
+          <td>${esc(metric(r.dupa))}</td>
+          <td>${esc(metric(r.brzuch))}</td>
+          <td>${esc(metric(r.klatka))}</td>
+          <td>${esc(metric(r.biceps))}</td>
+          <td>${esc(metric(r.szyja))}</td>
+        </tr>`).join("")}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function athletePreviewHTML(a){
+  const preview=STATE.athletePreview;
+  if(!preview||preview.athleteId!==a.id)return `<div class="previewShell"><div class="sectionTitle">Podgląd klienta</div><div class="panelNotice">Wybierz plan w polu nad zakładkami, żeby zobaczyć widok podopiecznego.</div></div>`;
+  const p=preview.plan;
+  const week=Math.min(Math.max(1,Number(STATE.previewWeek)||1),Number(p.weeks)||1);
+  return `<div class="previewShell">
+    <div class="detailHead">
+      <div><div class="sectionTitle" style="margin-bottom:4px">Podgląd klienta</div><div class="small">${esc(a.name)} · ${esc(p.name)} · start ${esc(p.start_date)} · ${esc(p.weeks)} tyg.</div></div>
+      <div class="btnRow"><button class="btn secondary" onclick="loadPlan('${p.id}')">Edytuj ten plan</button></div>
+    </div>
+    <div class="weekPicker">${Array.from({length:Number(p.weeks)||1},(_,i)=>i+1).map(w=>`<button class="weekPick ${w===week?"active":""}" onclick="setPreviewWeek(${w})">Tydz. ${w}</button>`).join("")}</div>
+    <div class="previewPhone">${clientWeekPreviewHTML(preview,week)}</div>
+  </div>`;
+}
+
+function clientWeekPreviewHTML(preview,week){
+  const notes=previewWeekNotes(preview,week);
+  return `<div>
+    <div class="eyebrow">MonkeyPanel preview</div>
+    <div class="title" style="font-size:28px">Tydzień ${week}</div>
+    ${notes?`<div class="note"><strong>Notatka tygodnia:</strong><br>${esc(notes)}</div>`:""}
+    <div class="clientWeek">${preview.trainings.map(t=>clientWorkoutPreviewHTML(preview,t,week)).join("")||`<div class="empty">Brak treningów w planie.</div>`}</div>
+  </div>`;
+}
+
+function clientWorkoutPreviewHTML(preview,t,week){
+  const rows=preview.trainingExercises.filter(r=>r.training_id===t.id).sort((a,b)=>(a.order_index||0)-(b.order_index||0));
+  return `<div class="clientWorkout">
+    <strong>${esc(t.name)}</strong>
+    <div class="small">${esc(t.focus||"")}</div>
+    ${rows.map(row=>clientExercisePreviewHTML(preview,row,week)).join("")||`<div class="small">Brak ćwiczeń.</div>`}
+  </div>`;
+}
+
+function clientExercisePreviewHTML(preview,row,week){
+  const ex=row.exercises||{};
+  const rx=progressionPreviewFor(preview,row,week);
+  const base=[row.sets_text,row.reps_text,row.rest_text].filter(Boolean).join(" · ");
+  return `<div class="clientExercise">
+    <div><strong>${esc(row.exercise_no||"")} ${esc(ex.name||row.source_name||"Ćwiczenie")}</strong></div>
+    <div class="small">${esc(base||row.notes||"")}</div>
+    ${rx}
+  </div>`;
+}
+
+function progressionPreviewFor(preview,row,week){
+  const mode=row.progression_mode==="manual_weight"?"prescribed_weight":(row.progression_mode||"none");
+  const blocks=preview.blocks.filter(b=>Number(b.start_week)<=Number(week)&&Number(b.end_week)>=Number(week));
+  const pe=preview.progressionExercises.find(x=>x.training_exercise_id===row.id&&blocks.some(b=>b.id===x.block_id));
+  if(!pe){
+    return mode!=="none"||row.use_wg?`<div class="rxLine"><span class="rxPill gold">brak rozpiski na tydzień ${week}</span></div>`:"";
+  }
+  const sets=preview.progressionSets.filter(s=>s.progression_exercise_id===pe.id&&Number(s.week_number)===Number(week)).sort((a,b)=>(a.set_no||0)-(b.set_no||0));
+  if(!sets.length)return `<div class="rxLine"><span class="rxPill gold">brak serii na tydzień ${week}</span></div>`;
+  return `<div class="rxLine">${sets.map(s=>`<span class="rxPill">${esc(formatProgressionSet(s))}</span>`).join("")}</div>`;
+}
+
+function formatProgressionSet(s){
+  const load=s.load_text||((s.kg!==null&&s.kg!==undefined)?`${money(s.kg)}kg`:"");
+  const reps=s.reps_text||"";
+  const rest=s.rest_text?` · ${s.rest_text}`:"";
+  return `${s.set_no}. ${[load,reps].filter(Boolean).join(" / ")}${rest}`.trim();
+}
+
+function copyClientKey(clientKey){
+  navigator.clipboard?.writeText(clientKey);
+  showToast("client_key skopiowany");
+}
+
+async function assignExistingPlanToAthlete(athleteId){
+  const planId=document.getElementById(`assignPlan_${athleteId}`)?.value;
+  if(!planId){showToast("Wybierz plan");return;}
+  try{
+    const {error}=await sb.from("plan_athletes").upsert({plan_id:planId,athlete_id:athleteId},{onConflict:"plan_id,athlete_id"});
+    if(error)throw error;
+    await loadAthleteAssignments();
+    showToast("Plan przypisany");
+    render();
+  }catch(err){setError(err);}
+}
+
+async function unassignPlanFromAthlete(athleteId,planId){
+  if(!confirm("Odpiąć plan od podopiecznego? Sam plan nie zostanie usunięty."))return;
+  try{
+    const {error}=await sb.from("plan_athletes").delete().eq("athlete_id",athleteId).eq("plan_id",planId);
+    if(error)throw error;
+    if(STATE.athletePreview?.athleteId===athleteId&&STATE.athletePreview?.plan?.id===planId)STATE.athletePreview=null;
+    await loadAthleteAssignments();
+    showToast("Plan odpięty");
+    render();
+  }catch(err){setError(err);}
+}
+
+async function loadAthletePreview(athleteId,planId){
+  setStatus("Ładuję podgląd klienta...","loading");render();
+  try{
+    let plan=STATE.plans.find(p=>p.id===planId)||STATE.athletePlanLinks.find(x=>x.plan_id===planId)?.plans||null;
+    if(!plan){
+      const res=await sb.from("plans").select("id,slug,name,start_date,weeks,status,notes,created_at,published_at").eq("id",planId).single();
+      if(res.error)throw res.error;plan=res.data;
+    }
+    const [tr,blocks,sessionsRes,measurementsRes]=await Promise.all([
+      sb.from("trainings").select("id,plan_id,name,focus,order_index").eq("plan_id",planId).order("order_index"),
+      sb.from("progression_blocks").select("id,plan_id,name,block_index,start_week,end_week,notes").eq("plan_id",planId).order("block_index"),
+      sb.from("workout_sessions").select("id,athlete_id,plan_id,source_plan_key,client_key,session_id,workout_date,performed_date,week_number,workout_id,workout_name,status,completed_exercises,total_exercises,session_note,recorded_at").eq("athlete_id",athleteId).eq("plan_id",planId).order("workout_date",{ascending:false}),
+      sb.from("athlete_measurements").select("id,athlete_id,plan_id,source_plan_key,client_key,measurement_date,week_number,waga,udo,dupa,brzuch,klatka,biceps,szyja,recorded_at").eq("athlete_id",athleteId).eq("plan_id",planId).order("measurement_date",{ascending:false})
+    ]);
+    if(tr.error)throw tr.error;if(blocks.error)throw blocks.error;if(sessionsRes.error)throw sessionsRes.error;if(measurementsRes.error)throw measurementsRes.error;
+    const trainings=tr.data||[];
+    const workoutSessions=sessionsRes.data||[];
+    const measurements=measurementsRes.data||[];
+    const trainingIds=trainings.map(t=>t.id);
+    let trainingExercises=[];
+    if(trainingIds.length){
+      const te=await sb.from("training_exercises").select("id,training_id,exercise_id,exercise_no,order_index,sets_text,reps_text,rest_text,weight,load_text,tempo_text,use_wg,progression_mode,superset_key,mode,notes,exercises(id,name,youtube_url)").in("training_id",trainingIds).order("order_index");
+      if(te.error)throw te.error;trainingExercises=te.data||[];
+    }
+    const blockIds=(blocks.data||[]).map(b=>b.id);
+    let progressionExercises=[],progressionSets=[],weekNotes=[];
+    if(blockIds.length){
+      const [pe,wn]=await Promise.all([
+        sb.from("progression_exercises").select("id,block_id,exercise_id,training_exercise_id,order_index,source_name").in("block_id",blockIds).order("order_index"),
+        sb.from("progression_week_notes").select("id,block_id,week_number,notes").in("block_id",blockIds).order("week_number")
+      ]);
+      if(pe.error)throw pe.error;if(wn.error)throw wn.error;
+      progressionExercises=pe.data||[];weekNotes=wn.data||[];
+      const peIds=progressionExercises.map(x=>x.id);
+      if(peIds.length){
+        const ps=await sb.from("progression_sets").select("id,progression_exercise_id,week_number,set_no,label,reps_text,kg,raw_text,load_text,set_count,is_skip,is_deload,rest_text,notes").in("progression_exercise_id",peIds).order("week_number");
+        if(ps.error)throw ps.error;progressionSets=ps.data||[];
+      }
+    }
+    let workoutSetLogs=[];
+    const workoutSessionIds=workoutSessions.map(s=>s.id);
+    if(workoutSessionIds.length){
+      const logs=await sb.from("workout_set_logs").select("id,workout_session_id,athlete_id,plan_id,source_plan_key,client_key,session_id,exercise_no,exercise_name,set_no,planned_label,kg,reps_text,rpe,done,note,recorded_at").in("workout_session_id",workoutSessionIds).order("session_id").order("set_no");
+      if(logs.error)throw logs.error;
+      workoutSetLogs=logs.data||[];
+    }
+    STATE.selectedAthleteId=athleteId;
+    STATE.selectedWorkoutSessionId=workoutSessions[0]?.id||null;
+    STATE.previewWeek=1;
+    STATE.athletePreview={athleteId,plan,trainings,trainingExercises,blocks:blocks.data||[],progressionExercises,progressionSets,weekNotes,workoutSessions,workoutSetLogs,measurements};
+    setStatus("Podgląd klienta załadowany","ok");
+    render();
+  }catch(err){setError(err);}
+}
+
+/* =========================
+   EXERCISE REGISTRY
+========================= */
+function renderExercises(){
+  document.getElementById("main").innerHTML=`<div class="topbar"><div><div class="eyebrow">Registry</div><div class="title">Ćwiczenia</div>${statusHTML()}</div><div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="saveExercises()">Zapisz registry</button></div></div>
+  <div class="section"><table class="registryTable"><thead><tr><th>Nazwa</th><th>YouTube</th><th>Tryb</th><th>Kategoria</th><th>Notatki</th><th></th></tr></thead><tbody>${STATE.exercises.map(e=>`<tr><td><input value="${esc(e.name)}" oninput="updateExercise('${e.id}','name',this.value)"></td><td><input value="${esc(e.youtube_url||"")}" oninput="updateExercise('${e.id}','youtube_url',this.value)"></td><td><select onchange="updateExercise('${e.id}','default_mode',this.value)"><option value="sets" ${e.default_mode==="sets"?"selected":""}>sets</option><option value="time" ${e.default_mode==="time"?"selected":""}>time</option><option value="done" ${e.default_mode==="done"?"selected":""}>done</option></select></td><td><input value="${esc(e.default_category||"")}" oninput="updateExercise('${e.id}','default_category',this.value)"></td><td><input value="${esc(e.notes||"")}" oninput="updateExercise('${e.id}','notes',this.value)"></td><td><button class="deleteX" onclick="deleteExercise('${e.id}')">×</button></td></tr>`).join("")}</tbody></table><div class="btnRow" style="margin-top:12px"><input id="newExerciseName" placeholder="Nowe ćwiczenie"><button class="btn secondary" onclick="createExerciseFromRegistry()">+ Dodaj</button></div></div>`;
+}
+async function createExerciseFromRegistry(){
+  const name=document.getElementById("newExerciseName").value.trim();
+  if(!name)return;
+  try{const {error}=await sb.from("exercises").insert({name,default_mode:"sets",default_category:"accessory"});if(error)throw error;await loadExercises();render();}catch(err){setError(err);}
+}
+async function deleteExercise(id){
+  if(!confirm("Ukryć ćwiczenie z registry? Stare plany zachowają nazwę i historię."))return;
+  try{
+    const {error}=await sb.from("exercises").update({archived_at:new Date().toISOString(),archived_reason:"ukryte z registry"}).eq("id",id);
+    if(error)throw error;
+    await loadExercises();
+    showToast("Ćwiczenie ukryte z registry");
+    render();
+  }catch(err){setError(err);}
+}
+
+/* =========================
+   SAVE
+========================= */
+async function savePlan(){
+  const currentPlan=getCurrentPlan();
+  if(!currentPlan)return;
+  STATE.saving=true;setStatus("Zapisuję plan...","loading");render();
+  try{
+    const p=currentPlan;
+    let res=await sb.from("plans").update({name:p.name,start_date:p.start_date,weeks:Number(p.weeks),status:p.status,notes:p.notes||null}).eq("id",p.id);
+    if(res.error)throw res.error;
+    for(const t of STATE.trainings){
+      res=await sb.from("trainings").update({name:t.name,focus:t.focus||null,order_index:Number(t.order_index)}).eq("id",t.id);
+      if(res.error)throw res.error;
+    }
+    for(const r of STATE.trainingExercises){
+      const pMode=r.progression_mode==="manual_weight"?"prescribed_weight":(r.progression_mode||"none");
+      res=await sb.from("training_exercises").update({exercise_no:r.exercise_no||null,sets_text:r.sets_text||null,reps_text:r.reps_text||null,rest_text:r.rest_text||null,weight:pMode==="prescribed_weight"?null:nullableNumber(r.weight),load_text:r.load_text||null,tempo_text:r.tempo_text||null,use_wg:pMode==="prescribed_weight",progression_mode:pMode,superset_key:r.superset_key||null,group_label:r.group_label||null,mode:r.mode||"sets",notes:r.notes||null,video_hint:r.video_hint||null}).eq("id",r.id);
+      if(res.error)throw res.error;
+    }
+    for(const r of STATE.resources){
+      res=await sb.from("plan_resources").update({label:r.label,url:r.url||null,resource_type:r.resource_type||"video",notes:r.notes||null}).eq("id",r.id);
+      if(res.error)throw res.error;
+    }
+    STATE.dirty=false;setStatus("Zapisano plan","ok");showToast("Plan zapisany");await loadPlans();await loadPlan(p.id);
+  }catch(err){setError(err);}
+  finally{STATE.saving=false;render();}
+}
+
+async function saveProgressionGrid(){
+  const activeId=STATE.activeBlockId;
+  STATE.saving=true;setStatus("Zapisuję progresję...","loading");render();
+  try{
+    const deletedProgressionExerciseIds=new Set(STATE.progressionExercises.filter(row=>row._delete).map(row=>row.id));
+    for(const block of STATE.blocks){
+      const payload={name:block.name||"BLOK",block_index:Number(block.block_index)||1,start_week:Number(block.start_week)||1,end_week:Math.max(Number(block.start_week)||1,Number(block.end_week)||1),notes:block.notes||null};
+      const {error}=await sb.from("progression_blocks").update(payload).eq("id",block.id);
+      if(error)throw error;
+    }
+    for(const note of STATE.weekNotes){
+      const text=String(note.notes||"").trim();
+      if(!text){
+        if(!isTempId(note.id)){
+          const {error}=await sb.from("progression_week_notes").delete().eq("id",note.id);
+          if(error)throw error;
+        }
         continue;
       }
-      setsFor(row,sess).forEach((set,i)=>rows.push(setLogPayload(workoutSessionId,sess,row,{set_no:i+1,planned_label:set.note,kg:nullableNumber(set.kg),reps_text:set.reps||null,rpe:nullableNumber(set.rpe),done:!!set.done,note:set.freeNote||null})));
+      const {error}=await sb.from("progression_week_notes").upsert({
+        block_id:note.block_id,
+        week_number:Number(note.week_number),
+        notes:text,
+        updated_at:new Date().toISOString()
+      },{onConflict:"block_id,week_number"});
+      if(error)throw error;
     }
-    if(rows.length){const ins=await sb.from("workout_set_logs").insert(rows);if(ins.error)throw ins.error}
-    clearSessionDraft(sess);
-    await loadPlanBundle();
-    showToast("Trening zapisany w Supabase");
-  }catch(err){console.error(err);setStatus("Błąd zapisu treningu","err");showToast("Nie udało się zapisać treningu");render()}
+    for(const s of STATE.progressionSets.filter(row=>(row._delete||deletedProgressionExerciseIds.has(row.progression_exercise_id))&&!isTempId(row.id))){
+      const {error}=await sb.from("progression_sets").delete().eq("id",s.id);
+      if(error)throw error;
+    }
+    for(const pe of STATE.progressionExercises.filter(row=>row._delete&&!isTempId(row.id))){
+      const {error}=await sb.from("progression_exercises").delete().eq("id",pe.id);
+      if(error)throw error;
+    }
+    for(const s of STATE.progressionSets.filter(row=>!row._delete&&!deletedProgressionExerciseIds.has(row.progression_exercise_id))){
+      const payload=progressionSetPayload(s);
+      if(isTempId(s.id)){
+        const {error}=await sb.from("progression_sets").insert({...payload,progression_exercise_id:s.progression_exercise_id,week_number:Number(s.week_number),set_no:Number(s.set_no)});
+        if(error)throw error;
+      }else{
+        const {error}=await sb.from("progression_sets").update({...payload,set_no:Number(s.set_no)}).eq("id",s.id);
+        if(error)throw error;
+      }
+    }
+    STATE.dirty=false;setStatus("Progresja zapisana","ok");showToast("Progresja zapisana");
+    STATE.activeBlockId=activeId;
+    await loadPlan(STATE.currentPlan.id);
+    STATE.activeBlockId=activeId;
+    STATE.tab="progression";
+    render();
+  }catch(err){setError(err);}
+  finally{STATE.saving=false;render();}
 }
-function setLogPayload(workoutSessionId,sess,row,extra){return{workout_session_id:workoutSessionId,athlete_id:app.athlete.id,plan_id:app.plan.id,source_plan_key:app.sourcePlanKey,client_key:app.athlete.client_key,session_id:sess.id,exercise_no:row.exercise_no||null,exercise_name:sourceName(row),recorded_at:new Date().toISOString(),...extra}}
-function clearSessionDraft(sess){for(const row of workoutForSession(sess).exercises){delete app.draft.logs[exerciseKey(row,sess)];delete app.draft.skips[exerciseKey(row,sess)]}delete app.draft.sessionNotes[sessionKey(sess)];saveDraft()}
-function renderPlan(){
-  const week=Number(app.previewWeek)||nextPendingSession()?.week||1;
-  $("view").innerHTML=`<div class="weekPicker">${Array.from({length:Number(app.plan.weeks)||1},(_,i)=>i+1).map(w=>`<button class="weekPick ${w===week?"active":""}" onclick="app.previewWeek=${w};renderPlan()">T${w}</button>`).join("")}</div><section class="card"><h2>Tydzień ${week}</h2><div class="subtitle" style="margin-bottom:12px">${esc(app.plan.name)} · ${esc(app.plan.status||"active")}</div>${weekNotes(week)}<div class="list">${workouts().map(w=>planWorkoutHTML(w,week)).join("")}</div></section>`;
-}
-function planWorkoutHTML(w,week){return `<div class="item"><strong>${esc(w.name)}</strong><div class="subtitle">${esc(w.focus||"")}</div>${w.exercises.map(row=>planExerciseHTML(row,week)).join("")}</div>`}
-function planExerciseHTML(row,week){const rx=progressionFor(row,week),base=[row.sets_text,row.reps_text,row.rest_text,row.load_text,row.tempo_text].filter(Boolean).join(" · ");return `<div class="summaryLine" style="display:block"><strong>${esc(row.exercise_no||"")} ${esc(sourceName(row))}</strong><div class="subtitle">${esc(base||row.notes||"")}</div>${rx.length?`<div class="rxLine">${rx.map(s=>`<span class="rxPill gold">${esc(formatProgressionSet(s))}</span>`).join("")}</div>`:""}</div>`}
-function renderMeasurements(){
-  const key=todayISO(),vals=app.draft.measurements[key]||{},week=nextPendingSession()?.week||currentSession()?.week||1;
-  $("view").innerHTML=`<section class="card"><h2>Pomiary i waga</h2><div class="subtitle" style="margin-bottom:14px">Data ${key} · tydzień ${week}</div>${MEASUREMENTS.map(([col,label,unit])=>`<label class="measure-row"><span>${label}</span><input inputmode="decimal" placeholder="${unit}" value="${esc(vals[col]||"")}" oninput="setMeasurement('${col}',this.value)"></label>`).join("")}<button class="btn good full" onclick="saveMeasurements()">Zapisz pomiary</button></section><section class="card" style="margin-top:12px"><h2>Poprzednie pomiary</h2>${measurementHistoryHTML()}</section>`;
-}
-function setMeasurement(col,value){const key=todayISO();app.draft.measurements[key]=app.draft.measurements[key]||{};app.draft.measurements[key][col]=value;saveDraft()}
-async function saveMeasurements(){
-  const date=todayISO(),vals=app.draft.measurements[date]||{},week=nextPendingSession()?.week||currentSession()?.week||1;
-  const payload={athlete_id:app.athlete.id,plan_id:app.plan.id,source_plan_key:app.sourcePlanKey,client_key:app.athlete.client_key,measurement_date:date,week_number:week,recorded_at:new Date().toISOString()};
-  for(const [col] of MEASUREMENTS)payload[col]=nullableNumber(vals[col]);
+
+async function saveAthletes(){
   try{
-    const {error}=await sb.from("athlete_measurements").upsert(payload,{onConflict:"athlete_id,source_plan_key,measurement_date"});
-    if(error)throw error;
-    delete app.draft.measurements[date];saveDraft();await loadPlanBundle();showToast("Pomiary zapisane w Supabase");
-  }catch(err){console.error(err);showToast("Nie udało się zapisać pomiarów")}
+    for(const athlete of STATE.athletes){
+      if(!athlete.name||!athlete.client_key)continue;
+      const {error}=await sb.from("athletes").update({name:athlete.name.trim(),client_key:slugify(athlete.client_key),status:athlete.status||"active",notes:athlete.notes||null}).eq("id",athlete.id);
+      if(error)throw error;
+    }
+    await Promise.all([loadAthletes(),loadAthleteAssignments()]);
+    STATE.dirty=false;setStatus("Podopieczni zapisani","ok");showToast("Podopieczni zapisani");render();
+  }catch(err){setError(err);}
 }
-function measurementHistoryHTML(){
-  if(!app.measurements.length)return`<div class="empty">Brak pomiarów dla tego planu.</div>`;
-  return `<div class="historyTable"><table><thead><tr><th>Data</th><th>Tydz.</th>${MEASUREMENTS.map(([,label])=>`<th>${label}</th>`).join("")}</tr></thead><tbody>${app.measurements.map(r=>`<tr><td>${esc(r.measurement_date)}</td><td>${esc(r.week_number||"-")}</td>${MEASUREMENTS.map(([col])=>`<td>${esc(r[col]??"-")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+
+async function saveExercises(){
+  try{
+    for(const e of STATE.exercises){
+      if(!e.name||!e.name.trim())continue;
+      const {error}=await sb.from("exercises").update({name:e.name.trim(),youtube_url:e.youtube_url||null,notes:e.notes||null,default_mode:e.default_mode||"sets",default_category:e.default_category||null}).eq("id",e.id);
+      if(error)throw error;
+    }
+    await loadExercises();STATE.dirty=false;setStatus("Registry zapisane","ok");render();
+  }catch(err){setError(err);}
 }
-function renderHistory(){
-  const rows=[...app.sessions].sort((a,b)=>String(b.workout_date||"").localeCompare(String(a.workout_date||"")));
-  $("view").innerHTML=`<section class="card"><h2>Log treningowy</h2><div class="subtitle" style="margin-bottom:12px">${rows.length} treningów zapisanych w Supabase</div>${rows.length?`<div class="list">${rows.map(historySessionHTML).join("")}</div>`:`<div class="empty">Brak zapisanych treningów.</div>`}</section>`;
-}
-function historySessionHTML(s){
-  const logs=app.setLogs.filter(l=>l.workout_session_id===s.id),exCount=new Set(logs.map(l=>`${l.exercise_no}|${l.exercise_name}`)).size;
-  return `<button class="item planButton" onclick="setSession('${esc(s.session_id)}')"><strong>${esc(s.workout_name)} · tydz. ${esc(s.week_number)}</strong><div class="subtitle">${esc(s.performed_date||s.workout_date)} · ${esc(s.status)} · ${exCount} ćwiczeń · ${logs.filter(l=>l.done).length} serii</div></button>`;
-}
-function renderClient(){
-  const st=currentPlanStats();
-  $("view").innerHTML=`<section class="card"><h2>${esc(app.athlete.name)}</h2><div class="subtitle">${esc(app.athlete.client_key)} · ${esc(app.athlete.status||"active")}</div><div class="metaGrid"><div class="metaBox"><small>Plan</small><strong>${esc(app.plan.name)}</strong></div><div class="metaBox"><small>Start</small><strong>${esc(app.plan.start_date)}</strong></div><div class="metaBox"><small>Postęp</small><strong>${st.done}/${st.total}</strong></div><div class="metaBox"><small>Źródło</small><strong>Supabase</strong></div></div><button class="btn secondary full" onclick="changeClient()">Zmień podopiecznego</button></section><section class="card" style="margin-top:12px"><h2>Przypisane plany</h2><div class="list">${app.links.map(l=>`<div class="item ${l.plan_id===app.plan.id?"activePlan":""}"><strong>${esc(l.plans?.name||l.plan_id)}</strong><div class="subtitle">${esc(l.plans?.status||"")} · ${esc(l.plans?.start_date||"-")}</div></div>`).join("")}</div></section>`;
-}
-function changeClient(){app.athlete=null;app.plan=null;history.replaceState(null,"",location.pathname);render()}
-function scrollToTop(){requestAnimationFrame(()=>scrollTo({top:0,behavior:"smooth"}))}
-async function reloadCurrent(){setStatus("Odświeżanie…","loading");render();await loadPlanBundle()}
+
 init();
 </script>
 </body>
