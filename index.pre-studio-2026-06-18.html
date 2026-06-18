@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GorIllia · panel trenera</title>
+<title>GorIlliaPanel v0.35 Plan Builder</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#111318;--panel:#181b21;--panel2:#101217;--line:#2b3038;--text:#f4f6f8;--muted:#9aa3b2;--gold:#d7b05a;--green:#22c55e;--red:#ef4444;--blue:#38bdf8;--warn:#f59e0b;--soft:#20242c}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.35}button,input,select,textarea{font:inherit}
@@ -43,286 +43,20 @@ input,select,textarea{background:#fff;border:1px solid var(--line2);color:var(--
 .athleteCard,.athleteHero{background:var(--card);border-color:var(--line);color:var(--ink)}.athleteCard.active{background:#fffbe9;border-color:var(--ink)}.athleteName,.athleteHeroTitle{color:var(--ink);font-family:Archivo,Inter,sans-serif;font-weight:700}.metricLabel{color:var(--pencil);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.metricValue{color:var(--ink);font-weight:800}.previewShell{padding:16px}.previewPhone{background:#15171c;color:#eef0f4;border:6px solid #23252b;border-radius:20px;box-shadow:0 16px 38px rgba(35,37,43,.18)}.previewPhone .small,.clientExercise .small{color:#8d93a1}.clientWorkout{background:#1a1d23;border-color:#2c2f37;color:#eef0f4}.clientExercise{border-top-color:#262932}.rxPill{background:#14161b;border-color:#343845;color:#cdd2dc}.rxPill.gold{border-color:#4b3f17;color:#fbe9a6}.weekPick{background:var(--card);border:1px solid var(--line2);color:var(--ink2);font-weight:600}.weekPick.active{background:var(--ink);border-color:var(--ink);color:var(--card)}
 .toast{left:50%;right:auto;transform:translateX(-50%);background:var(--ink);color:var(--card);border-radius:12px;padding:11px 18px;font-weight:600;box-shadow:0 14px 34px rgba(35,37,43,.24)}button:focus-visible,.btn:focus-visible,.miniBtn:focus-visible,.builderStep:focus-visible,.tab:focus-visible{outline:3px solid var(--mark-soft);outline-offset:2px}
 @media(max-width:760px){.globalTopNav{padding:10px 12px}.main{padding:14px 12px 42px}.topbar{align-items:flex-start}.title{font-size:23px}.section{padding:14px}.nav{gap:2px}.nav button{white-space:nowrap}}
-
-/* v0.36 — Studio */
-:root{
-  --app-bg:#eeeeea;
-  --card:#fff;
-  --card-alt:#fbfbfa;
-  --card-head:#f7f7f4;
-  --ink:#232629;
-  --ink-2:#4d535c;
-  --muted:#888d95;
-  --faint:#a2a6ad;
-  --line:#e7e7e2;
-  --line-soft:#eeeee9;
-  --row-line:#f2f2ee;
-  --accent:#4e7a5e;
-  --accent-soft:#e5ede7;
-  --accent-line:#cbded2;
-  --accent-ink:#3c6450;
-  --warn-soft:#f5efe1;
-  --warn-line:#e7d8b9;
-  --warn-ink:#8a6d2e;
-  --info-soft:#eaf0f3;
-  --info-line:#cfdee6;
-  --info-ink:#3a6a82;
-  --radius-card:11px;
-  --radius-ctrl:8px;
-  --shadow:0 12px 40px rgba(35,38,41,.08);
-}
-html{background:var(--app-bg);scrollbar-gutter:stable}
-body{background:var(--app-bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13.5px;line-height:1.42}
-button,input,select,textarea{font-family:inherit}
-button{color:inherit}
-.logo,.title,.sectionTitle,.planCardTitle,.progressExerciseTitle,.historyTitle,.metricValue,.athleteHeroTitle,.trainingNameInput{font-family:Archivo,"Public Sans",sans-serif}
-.app{display:block;min-height:100vh}
-.globalTopNav{height:54px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;padding:0 28px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:none;position:sticky;top:0;z-index:30}
-.brandBlock{display:flex;align-items:baseline;gap:9px;min-width:220px}
-.logo{font-size:17px;font-weight:700;letter-spacing:-.02em}
-.version{font-size:11.5px;font-weight:500;color:var(--muted)}
-.nav{display:flex;align-self:stretch;gap:28px}
-.nav button{position:relative;display:flex;align-items:center;border:0;background:transparent;border-radius:0;padding:0 2px;color:var(--muted);font-size:13px;font-weight:600;min-height:54px}
-.nav button::before{display:none}
-.nav button:hover{background:transparent;color:var(--ink)}
-.nav button.active{background:transparent;color:var(--ink);font-weight:700}
-.nav button.active::after{content:"";position:absolute;left:0;right:0;bottom:10px;height:3px;border-radius:3px;background:var(--accent)}
-.trainerAvatar{justify-self:end;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#eff2ef;border:1px solid #dfe4df;color:var(--accent);font-size:11px;font-weight:700}
-.main{width:100%;max-width:1540px;margin:0 auto;padding:27px 28px 64px}
-.topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:22px}
-.studioTopbar{min-height:76px}
-.eyebrow{color:var(--faint);font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
-.title{margin-top:2px;color:var(--ink);font-size:25px;font-weight:700;letter-spacing:-.02em;line-height:1.12}
-.screenMeta{margin-top:3px;color:var(--muted);font-size:12px}
-.status{margin-top:7px;color:var(--muted);font-size:11px;font-weight:500}
-.status::before{width:6px;height:6px}
-.status.ok{color:var(--accent)}
-.status.ok::before{background:var(--accent)}
-.status.loading{color:var(--warn-ink)}
-.status.loading::before{background:#c5902f}
-.status.err{color:#a1493d}
-.topbarActions{display:flex;align-items:center;gap:10px}
-.searchField{min-width:260px;height:38px;display:flex;align-items:center;gap:7px;padding:0 11px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-ctrl);color:var(--faint)}
-.searchField input{height:36px;min-height:0;padding:0;border:0;background:transparent;box-shadow:none;font-size:13px}
-.searchField input:focus{border:0;box-shadow:none}
-.searchField span{font-size:17px;line-height:1}
-.btn{min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border:1px solid var(--ink);border-radius:var(--radius-ctrl);background:var(--ink);color:#fff;font-family:"Public Sans",sans-serif;font-size:12.5px;font-weight:600;letter-spacing:0;box-shadow:none}
-.btn:hover{transform:none;filter:brightness(.97)}
-.btn.secondary{background:transparent;color:var(--ink);border-color:var(--line)}
-.btn.secondary:hover{background:var(--card);border-color:#d7d7d1}
-.btn.good{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.danger{background:transparent;color:#9a5148;border-color:#eadad7}
-.btn.danger:hover{background:#fbf3f2}
-.btnRow{gap:9px}
-input,select,textarea{min-height:36px;padding:7px 10px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-ctrl);color:var(--ink);font-size:13px;font-variant-numeric:tabular-nums;outline:none}
-textarea{min-height:72px}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-input::placeholder,textarea::placeholder{color:var(--faint)}
-input:disabled{background:var(--card-alt);color:var(--muted)}
-.field label{margin-bottom:5px;color:var(--faint);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.section,.training,.progressExerciseCard,.weekNotesPanel,.historyPanel,.metricCard,.previewShell,.clientWorkout,.planRow,.previewPicker,.athleteHero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:none}
-.section{padding:17px 18px;margin-bottom:14px}
-.sectionTitle{margin-bottom:11px;color:var(--ink);font-size:15px;font-weight:700}
-.small,.muted{color:var(--muted);font-size:12px}
-.note,.athleteNote{padding:10px 13px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:9px;color:var(--accent-ink);font-size:12.5px}
-.empty,.emptyWeek,.panelNotice{padding:22px;background:transparent;border:1.5px dashed #d8d8d0;border-radius:var(--radius-card);color:var(--muted);text-align:center}
-.pill{display:inline-flex;align-items:center;margin:0;padding:3px 10px;border-radius:999px;background:var(--card-alt);border:1px solid var(--line);color:var(--muted);font-size:11px;font-weight:600;line-height:1.15}
-.pill.good{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-ink)}
-.pill.warn{background:var(--warn-soft);border-color:var(--warn-line);color:var(--warn-ink)}
-.pill.blue{background:var(--info-soft);border-color:var(--info-line);color:var(--info-ink)}
-.pill.neutral{background:#f2f2ef;border-color:#e2e2dc;color:#6d727a}
-
-/* Plans */
-.planCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.planCard{min-height:172px;display:flex;flex-direction:column;align-items:flex-start;padding:17px 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-card);text-align:left;cursor:pointer;transition:border-color .12s ease,transform .12s ease}
-.planCard:hover{transform:translateY(-1px);border-color:#d8ddd8;box-shadow:none}
-.planCardTitle{margin-top:13px;color:var(--ink);font-size:16px;font-weight:700;letter-spacing:-.015em}
-.planCardMeta{margin-top:7px;color:var(--muted);font-size:12.5px}
-.planCardFooter{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:13px;border-top:1px solid var(--line-soft);color:var(--muted);font-size:11.5px}
-.avatarStack{display:flex;align-items:center}
-.avatarStack .avatar+.avatar{margin-left:-6px}
-.avatar{flex:0 0 auto;display:inline-grid;place-items:center;border-radius:50%;background:#dce7df;color:var(--accent-ink);font-weight:700}
-.avatar-xs{width:23px;height:23px;border:2px solid var(--card);font-size:8px}
-.avatar-sm{width:34px;height:34px;font-size:10px}
-.avatar-lg{width:49px;height:49px;font-size:16px}
-.avatar-more{background:#e8e7e1;color:#72767d}
-.planCard.new{align-items:center;justify-content:center;gap:7px;background:transparent;border:1.5px dashed #d8d8d0;color:var(--muted);font-family:"Public Sans",sans-serif;font-size:12px}
-.planCard.new strong{font-size:13px;font-weight:600}
-.newPlus{color:var(--accent);font-size:22px;line-height:1}
-
-/* Builder */
-.builderTopbar{margin-bottom:12px}
-.builderNav{display:flex;gap:14px;margin:0 0 20px;padding:0;border:0;border-bottom:1px solid var(--line);background:transparent}
-.builderStep,.tab{position:relative;width:auto;min-height:40px;padding:9px 14px 11px;border:0;border-radius:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:600}
-.builderStep:hover,.tab:hover{background:transparent;color:var(--ink)}
-.builderStep.active,.tab.active{background:transparent;color:var(--ink);font-weight:700}
-.builderStep.active::after,.tab.active::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:3px;border-radius:3px;background:var(--accent)}
-.builderStepNo{display:none}
-.builderSection{min-width:0}
-.training{overflow:auto;margin-bottom:14px}
-.trainingHead{min-width:1080px;display:grid;grid-template-columns:minmax(0,1fr) auto 30px;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border-bottom:1px solid var(--line)}
-.trainingIdentity{display:flex;align-items:center;gap:12px}
-.trainingNameInput,.trainingFocusInput{width:auto;min-height:28px;padding:2px 6px;border:0;box-shadow:none;background:transparent}
-.trainingNameInput{max-width:260px;font-size:14.5px;font-weight:700}
-.trainingFocusInput{min-width:260px;color:var(--muted);font-size:12px}
-.trainingNameInput:focus,.trainingFocusInput:focus{border:0;box-shadow:0 0 0 2px var(--accent-soft)}
-.trainingCount{color:var(--muted);font-size:11.5px}
-.trainingDelete{opacity:.5}
-.exerciseGrid{min-width:1080px;grid-template-columns:46px minmax(220px,1.3fr) 64px 78px 82px 86px 78px 144px 86px 82px 28px;gap:7px;padding:7px 13px;border-top:1px solid var(--row-line);align-items:center;font-variant-numeric:tabular-nums}
-.exerciseGrid.header{padding-top:8px;padding-bottom:8px;background:var(--card-alt);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.exerciseGrid:not(.header):hover{background:#fafbf9}
-.exerciseGrid input,.exerciseGrid select{min-height:30px;padding:4px 7px;border-color:transparent;background:transparent}
-.exerciseGrid input:hover,.exerciseGrid select:hover,.exerciseGrid input:focus,.exerciseGrid select:focus{background:var(--card);border-color:var(--line)}
-.exerciseName{font-size:12.5px;font-weight:600}
-.exerciseNoteInput{display:block;width:100%;margin-top:2px;color:var(--muted);font-size:11px}
-.exerciseNoInput{color:var(--faint);font-weight:700}
-.exerciseNoInput.supersetNo,.supersetLabel{color:var(--accent);font-weight:700}
-.addBar{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:10px 13px;background:var(--card-head);border-top:1px solid var(--line)}
-.deleteX{width:28px;height:28px;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--faint);font-size:16px;cursor:pointer}
-.deleteX:hover{border-color:#eadad7;background:#fbf3f2;color:#9a5148}
-.addTrainingButton,.rosterAdd{width:100%;min-height:52px;border:1.5px dashed #d8d8d0;border-radius:var(--radius-card);background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer}
-.addTrainingButton:hover,.rosterAdd:hover{border-color:var(--accent-line);color:var(--accent)}
-.progressTop{margin-bottom:14px}
-.blockTabs{gap:7px}
-.blockTab{padding:7px 12px;background:var(--card);border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:11.5px;font-weight:600}
-.blockTab.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.blockEditor{gap:9px}
-.progressExerciseCard{overflow:hidden;margin-top:13px}
-.progressExerciseHead{padding:12px 13px;background:var(--card);border-bottom:1px solid var(--line)}
-.progressExerciseTitle{font-size:15px;font-weight:700}
-.weekStrip{display:grid;grid-template-columns:repeat(4,minmax(270px,1fr));gap:10px;padding:11px;background:var(--card-alt);overflow:auto}
-.weekCard{width:auto;padding:10px;background:var(--card);border:1px solid var(--line);border-radius:9px}
-.weekTitle{margin-bottom:9px;color:var(--ink);font-family:Archivo,"Public Sans",sans-serif;font-size:13px;font-weight:700}
-.setHeader{color:var(--faint);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-.setNo{height:32px;background:var(--card-alt);border:1px solid var(--line);color:var(--muted);font-size:11px}
-.miniBtn{padding:5px 8px;background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--ink-2);font-size:10.5px;font-weight:600}
-.miniBtn.good{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-ink)}
-.weekNotesPanel{padding:13px}
-.weekNotesTitle{color:var(--ink);font-size:14px}
-
-/* Athletes */
-.athleteLayout{display:grid;grid-template-columns:262px minmax(0,1fr);gap:20px;align-items:start}
-.rosterPanel{position:sticky;top:76px;max-height:calc(100vh - 102px);overflow:auto}
-.rosterSearch{min-width:0;width:100%;margin-bottom:9px}
-.athleteList{display:grid;gap:8px}
-.athleteCard{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;padding:11px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--ink);text-align:left;cursor:pointer}
-.athleteCard.active{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.athleteName{display:block;color:var(--ink);font-family:"Public Sans",sans-serif;font-size:12.5px;font-weight:600}
-.athleteCardMeta{display:block;margin-top:1px;color:var(--muted);font-size:11.5px}
-.rosterAdd{margin-top:10px}
-.athleteWorkspace{min-width:0}
-.athleteHero{display:block;padding:18px;margin-bottom:14px}
-.athleteHeroTop{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.athleteHeroIdentity{display:flex;align-items:center;gap:13px}
-.athleteHeroTitle{font-size:20px;font-weight:700;letter-spacing:-.015em}
-.athleteFacts{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:18px}
-.athleteFacts span{display:block;color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.athleteFacts strong{display:block;margin-top:3px;color:var(--ink-2);font-size:12.5px;font-weight:500}
-.metricStrip{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-bottom:14px}
-.metricCard{padding:13px 15px}
-.metricLabel{color:var(--faint);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.metricValue{margin-top:2px;color:var(--ink);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
-.metricValue.metricPlan{font-size:15px;line-height:1.3;margin-top:5px}
-.athleteTabs{display:flex;gap:8px;margin-bottom:14px;border-bottom:1px solid var(--line)}
-.profileFields{grid-template-columns:1.1fr 1fr .8fr .8fr}
-.coachNotes textarea{min-height:86px;border:0;padding:0;resize:vertical}
-.coachNotes textarea:focus{box-shadow:none}
-.previewPicker{grid-template-columns:minmax(220px,360px) auto;margin-bottom:14px;padding:11px}
-.planRow{padding:12px 13px}
-
-/* History */
-.historyHeader{margin:22px 0 13px}
-.historyScreenTitle{font-size:24px}
-.historyStats{display:flex;align-items:center;gap:8px;margin:0}
-.historyGrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.85fr);gap:14px}
-.historyPanel{min-width:0;padding:0;overflow:hidden}
-.historyPanel>.historyTitle{padding:13px 15px;margin:0;border-bottom:1px solid var(--line)}
-.historyTitle{color:var(--ink);font-size:14px;font-weight:700}
-.tableWrap{overflow:auto;border:0;border-radius:0;background:var(--card)}
-.dataTable,.setLogTable,.registryTable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.dataTable.sessionsTable{min-width:620px}
-.dataTable th,.dataTable td,.setLogTable th,.setLogTable td{padding:10px 13px;border:0;border-bottom:1px solid var(--row-line);text-align:left;vertical-align:middle}
-.dataTable th,.setLogTable th{position:static;background:var(--card-alt);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.dataTable tbody tr:hover{background:#f7f9f7}
-.sessionRowActive{background:#f3f7f4}
-.rowSelect{padding:0;border:0;background:transparent;color:var(--ink);font:inherit;cursor:pointer}
-.sessionDetailsPanel{padding:15px;overflow:visible}
-.sessionDetailHead{padding-bottom:12px;border-bottom:1px solid var(--line)}
-.sessionExerciseList{display:grid;gap:12px;padding-top:12px}
-.sessionExercise>strong{font-size:12px;font-weight:600}
-.setChips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}
-.setChips span{padding:6px 8px;background:var(--card-alt);border:1px solid var(--line);border-radius:7px;color:var(--ink-2);font-size:11.5px;font-variant-numeric:tabular-nums}
-.setChips b{color:var(--accent);font-weight:600}
-.athleteNote{margin-top:14px}
-
-/* Registry */
-.filterPills{display:flex;gap:7px;overflow:auto;margin:-6px 0 13px}
-.filterPill{padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:11.5px;font-weight:600;white-space:nowrap}
-.filterPill.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.registrySection{padding:0;overflow:hidden}
-.registryTable{min-width:940px}
-.registryTable th,.registryTable td{padding:8px 11px;border:0;border-bottom:1px solid var(--row-line);text-align:left}
-.registryTable th{background:var(--card-alt);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.registryTable input,.registryTable select{border-color:transparent;background:transparent}
-.registryTable input:hover,.registryTable select:hover,.registryTable input:focus,.registryTable select:focus{background:var(--card);border-color:var(--line)}
-.registryName{font-weight:600}
-.registryAdd{grid-template-columns:minmax(240px,1fr) auto}
-
-.toast{left:50%;right:auto;bottom:22px;transform:translateX(-50%);padding:10px 16px;background:var(--ink);border-radius:9px;color:#fff;font-size:12px;font-weight:600;box-shadow:var(--shadow)}
-button:focus-visible,.btn:focus-visible,.miniBtn:focus-visible,.builderStep:focus-visible,.tab:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
-
-@media(max-width:1200px){
-  .historyGrid{grid-template-columns:1fr}
-  .sessionDetailsPanel{min-height:180px}
-  .profileFields{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:1000px){
-  .globalTopNav{grid-template-columns:1fr auto;padding:0 18px}
-  .nav{order:3;grid-column:1/-1;height:44px;justify-content:center}
-  .globalTopNav{height:auto;min-height:54px;padding-top:8px}
-  .nav button{min-height:44px}
-  .nav button.active::after{bottom:4px}
-  .trainerAvatar{grid-column:2}
-  .main{padding:22px 18px 54px}
-  .planCards{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .athleteLayout{grid-template-columns:1fr}
-  .rosterPanel{position:static;max-height:none}
-  .athleteList{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .athleteFacts,.metricStrip{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .weekStrip{grid-template-columns:repeat(4,minmax(260px,1fr))}
-}
-@media(max-width:700px){
-  .globalTopNav{gap:8px;padding:8px 12px 0}
-  .version{display:none}
-  .nav{gap:14px;justify-content:flex-start;overflow:auto}
-  .main{padding:18px 12px 44px}
-  .topbar{align-items:flex-start;flex-direction:column}
-  .topbarActions{width:100%;align-items:stretch;flex-direction:column}
-  .searchField{width:100%;min-width:0}
-  .planCards{grid-template-columns:1fr}
-  .builderNav{overflow:auto}
-  .builderStep{white-space:nowrap}
-  .athleteList{grid-template-columns:1fr}
-  .athleteFacts,.metricStrip,.profileFields{grid-template-columns:1fr}
-  .athleteHeroTop{align-items:flex-start}
-  .previewPicker{grid-template-columns:1fr}
-  .setChips{grid-template-columns:1fr}
-}
 </style>
 </head>
 <body>
 <div class="app">
   <header class="globalTopNav">
     <div class="brandBlock">
-      <div class="logo">GorIllia</div>
-      <div class="version">panel trenera</div>
+      <div class="logo">GorIlliaPanel</div>
+      <div class="version">v0.35 · friendly skin</div>
     </div>
     <nav class="nav">
       <button id="navPlans" class="active" onclick="showPlans()">Plany</button>
       <button id="navAthletes" onclick="showAthletes()">Podopieczni</button>
       <button id="navExercises" onclick="showExercises()">Rejestr ćwiczeń</button>
     </nav>
-    <div class="trainerAvatar" aria-label="Profil trenera">MJ</div>
   </header>
   <main class="main" id="main"></main>
 </div>
@@ -357,10 +91,6 @@ const STATE = {
   progressionSets:[],
   weekNotes:[],
   resources:[],
-  planQuery:"",
-  athleteQuery:"",
-  exerciseQuery:"",
-  exerciseCategory:"all",
   dirty:false,
   saving:false,
   statusText:"Ładowanie Supabase...",
@@ -371,8 +101,7 @@ const STATE = {
 const BUILDER_STEPS = [
   {id:"overview",label:"Ustawienia"},
   {id:"structure",label:"Treningi"},
-  {id:"progression",label:"Progresja"},
-  {id:"resources",label:"Materiały"}
+  {id:"progression",label:"Progresja"}
 ];
 
 // Small shared helpers used across render and data flows.
@@ -556,60 +285,13 @@ function shortDate(value){
   return value?String(value).slice(0,10):"-";
 }
 
-function humanDate(value){
-  if(!value)return "brak daty";
-  const months=["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"];
-  const date=new Date(`${String(value).slice(0,10)}T12:00:00`);
-  if(Number.isNaN(date.getTime()))return shortDate(value);
-  return `${date.getDate()} ${months[date.getMonth()]}`;
-}
-
-function initials(name){
-  return String(name||"?").split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join("").toUpperCase();
-}
-
-function statusMeta(status){
-  const normalized=norm(status);
-  if(["active","aktywny","published"].includes(normalized))return {label:"Aktywny",className:"good"};
-  if(["draft","szkic"].includes(normalized))return {label:"Szkic",className:"warn"};
-  if(["paused","wstrzymany"].includes(normalized))return {label:"Wstrzymany",className:"neutral"};
-  if(["done","completed","zrobiony","ukonczony"].includes(normalized))return {label:"Ukończony",className:"good"};
-  return {label:status||"Szkic",className:"neutral"};
-}
-
-function avatarHTML(name,size="sm"){
-  return `<span class="avatar avatar-${size}">${esc(initials(name))}</span>`;
-}
-
-function planAssignmentCount(planId){
-  return STATE.athletePlanLinks.filter(link=>link.plan_id===planId).length;
-}
-
 function metric(value){
   return value===null||value===undefined||value===""?"-":money(value);
 }
 
 function statusLabel(status){
   const text=String(status||"").trim();
-  if(text==="done")return "ukończony";
-  if(text==="done_with_skips")return "częściowy";
-  return text||"-";
-}
-
-function sessionStatusMeta(status){
-  const text=String(status||"").trim();
-  if(text==="done_with_skips")return {label:"częściowy",className:"warn"};
-  if(text==="done"||text==="completed")return {label:"ukończony",className:"good"};
-  return statusMeta(text);
-}
-
-function setLogChipHTML(log){
-  const kg=metric(log.kg);
-  const reps=String(log.reps_text||"").trim();
-  const rpe=metric(log.rpe);
-  const performance=[kg!=="-"?`${esc(kg)} kg`:"",reps&&reps!=="-"?`×${esc(reps)}`:""].filter(Boolean).join(" ");
-  const main=performance||esc(log.planned_label||"wykonano");
-  return `<span>${main}${rpe!=="-"?` <b>RPE ${esc(rpe)}</b>`:""}</span>`;
+  return text==="done"?"zrobiony":text||"-";
 }
 
 function previewWeekNotes(preview,week){
@@ -707,15 +389,14 @@ function updateExercise(id,field,value){
 /* =========================
    RENDER SHELL
 ========================= */
-function showPlans(){STATE.screen="plans";STATE.currentPlan=null;STATE.lastError="";setStatus("Połączono z Supabase","ok");render();}
+function showPlans(){STATE.screen="plans";STATE.currentPlan=null;STATE.lastError="";render();}
 async function showAthletes(){
   STATE.screen="athletes";STATE.currentPlan=null;STATE.lastError="";
-  setStatus("Połączono z Supabase","ok");
   if(!STATE.selectedAthleteId&&STATE.athletes[0])STATE.selectedAthleteId=STATE.athletes[0].id;
   render();
   try{await loadAthleteAssignments();render();}catch(err){setError(err);}
 }
-function showExercises(){STATE.screen="exercises";STATE.currentPlan=null;STATE.lastError="";setStatus("Połączono z Supabase","ok");render();}
+function showExercises(){STATE.screen="exercises";STATE.currentPlan=null;STATE.lastError="";render();}
 function switchTab(tab){STATE.tab=tab;render();}
 function render(){
   document.getElementById("navPlans").classList.toggle("active",STATE.screen==="plans"||STATE.screen==="builder");
@@ -728,32 +409,10 @@ function render(){
 }
 
 function renderPlans(){
-  const query=norm(STATE.planQuery);
-  const plans=STATE.plans.filter(plan=>!query||norm(`${plan.name} ${plan.slug} ${plan.status}`).includes(query));
-  const assignedCount=STATE.athletePlanLinks.length;
   document.getElementById("main").innerHTML=`
-    <div class="topbar studioTopbar">
-      <div><div class="eyebrow">Przegląd</div><div class="title">Plany treningowe</div><div class="screenMeta">${STATE.plans.length} planów · ${assignedCount} przypisań podopiecznych</div>${statusHTML()}</div>
-      <div class="topbarActions"><div class="searchField"><span>⌕</span><input value="${esc(STATE.planQuery)}" placeholder="Szukaj planu…" oninput="STATE.planQuery=this.value;renderPlans()"></div><button class="btn good" onclick="createPlan()">+ Nowy plan</button></div>
-    </div>
-    <div class="cards planCards">${plans.map(planCardHTML).join("")}<button class="planCard new" onclick="createPlan()"><span class="newPlus">+</span><strong>Nowy plan</strong><span>od zera lub z szablonu</span></button></div>
-    ${!plans.length?`<div class="panelNotice">Brak planów pasujących do wyszukiwania.</div>`:""}`;
-}
-
-function planCardHTML(p){
-  const state=statusMeta(p.status);
-  const links=STATE.athletePlanLinks.filter(link=>link.plan_id===p.id);
-  const athletes=links.map(link=>link.athletes).filter(Boolean);
-  const count=links.length;
-  return `<button class="planCard" onclick="loadPlan('${p.id}')">
-    <div><span class="pill ${state.className}">${esc(state.label)}</span></div>
-    <div class="planCardTitle">${esc(p.name)}</div>
-    <div class="planCardMeta">${esc(p.weeks||"-")} tygodni · start ${esc(humanDate(p.start_date))}</div>
-    <div class="planCardFooter">
-      <div class="avatarStack">${athletes.slice(0,3).map(a=>avatarHTML(a.name,"xs")).join("")}${count>3?`<span class="avatar avatar-xs avatar-more">+${count-3}</span>`:""}</div>
-      <span>${count?`${count} ${count===1?"podopieczny":"podopiecznych"}`:"Nieprzypisany"}</span>
-    </div>
-  </button>`;
+    <div class="topbar"><div><div class="eyebrow">Supabase</div><div class="title">Plany</div>${statusHTML()}</div><div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="createPlan()">Nowy plan</button></div></div>
+    <div class="note">Ten panel służy do ręcznego zbudowania planu w takim zakresie jak arkusz: treningi, ćwiczenia, superserie, tygodniowa progresja, materiały wideo i notatki tygodni w bloku.</div>
+    <div class="cards">${STATE.plans.map(p=>`<div class="planCard" onclick="loadPlan('${p.id}')"><div class="small">${esc(p.status).toUpperCase()}</div><div style="font-size:23px;font-weight:950;margin-top:8px">${esc(p.name)}</div><div class="small" style="margin-top:10px">${esc(p.weeks)} tyg. · start ${esc(p.start_date)}</div><div class="small">${esc(p.slug)}</div></div>`).join("")}<div class="planCard new" onclick="createPlan()">+ Nowy plan</div></div>`;
 }
 
 async function createPlan(){
@@ -776,9 +435,9 @@ function renderBuilder(){
   const activeStep=getBuilderStep();
   if(!p)return renderPlans();
   document.getElementById("main").innerHTML=`
-    <div class="topbar studioTopbar builderTopbar">
-      <div><div class="eyebrow">Kreator planu · ${esc(p.name)}</div><div class="title">${esc(BUILDER_STEPS.find(step=>step.id===activeStep)?.label||"Ustawienia")}</div><div class="screenMeta">${esc(p.weeks||"-")} tygodni · start ${esc(humanDate(p.start_date))}</div>${statusHTML()}</div>
-      <div class="btnRow"><button class="btn secondary" onclick="showPlans()">← Plany</button><button class="btn secondary" onclick="switchTab('overview')">Podgląd</button><button class="btn good" onclick="savePlan()" ${STATE.saving?"disabled":""}>${STATE.dirty?"Zapisz zmiany":"Zapisano ✓"}</button></div>
+    <div class="topbar">
+      <div><div class="eyebrow">Plan builder</div><div class="title">${esc(p.name)}</div><div class="small">${esc(p.status||"draft")} · start ${esc(p.start_date||"-")} · ${esc(p.weeks||"-")} tyg.</div>${statusHTML()}</div>
+      <div class="btnRow"><button class="btn secondary" onclick="showPlans()">Wróć</button><button class="btn good" onclick="savePlan()" ${STATE.saving?"disabled":""}>Zapisz <span data-dirty class="pill ${STATE.dirty?"warn":""}">${STATE.dirty?"zmiany":"ok"}</span></button></div>
     </div>
     <div class="builderNav">${builderStepNavHTML(activeStep)}</div>
     <div class="builderPane">${builderStepContentHTML(activeStep)}</div>`;
@@ -797,7 +456,6 @@ function builderStepContentHTML(step){
   if(step==="overview")return `<div class="section">${settingsHTML()}</div>`;
   if(step==="structure")return structureHTML();
   if(step==="progression")return progressionHTML();
-  if(step==="resources")return resourcesHTML();
   return `<div class="section">${settingsHTML()}</div>`;
 }
 
@@ -829,16 +487,18 @@ function athleteAssignmentHTML(){
 }
 
 function structureHTML(){
-  return `<div class="builderSection">
+  return `<div class="section">
+    <div class="sectionTitle">Treningi</div>
+    <div class="note">Tu budujesz treningi: ćwiczenia, serie, powtórzenia, przerwy, tempo, superserie i informację, które ćwiczenia mają progresję tygodniową.</div>
     ${STATE.trainings.map(trainingHTML).join("")||`<div class="empty">Brak treningów. Dodaj pierwszy trening.</div>`}
-    <button class="addTrainingButton" onclick="createTraining()">+ Dodaj trening</button>
+    <button class="btn" onclick="createTraining()">+ Dodaj trening</button>
   </div>`;
 }
 
 function trainingHTML(t){
   const rows=getTrainingRows(t.id);
   return `<div class="training">
-    <div class="trainingHead"><div class="trainingIdentity"><input class="trainingNameInput" value="${esc(t.name)}" oninput="updateTraining('${t.id}','name',this.value)"><input class="trainingFocusInput" placeholder="Klatka · plecy · barki" value="${esc(t.focus||"")}" oninput="updateTraining('${t.id}','focus',this.value)"></div><div class="trainingCount">${rows.length} ćwiczeń</div><button class="deleteX trainingDelete" title="Usuń trening" onclick="deleteTraining('${t.id}')">×</button></div>
+    <div class="trainingHead"><input value="${esc(t.name)}" oninput="updateTraining('${t.id}','name',this.value)"><input placeholder="Focus / notatka treningu" value="${esc(t.focus||"")}" oninput="updateTraining('${t.id}','focus',this.value)"><button class="btn danger" onclick="deleteTraining('${t.id}')">Usuń</button></div>
     <div class="exerciseGrid header"><div>Nr</div><div>Ćwiczenie</div><div>Serie</div><div>Powt.</div><div>Przerwa</div><div>Ciężar</div><div>Tempo</div><div>Progresja</div><div>Typ</div><div>Superset</div><div></div></div>
     ${rows.map(exerciseRowHTML).join("")||`<div class="empty" style="margin:12px">Brak ćwiczeń</div>`}
     ${addExerciseHTML(t.id)}
@@ -850,8 +510,8 @@ function exerciseRowHTML(row){
   const rawPMode=row.progression_mode||(row.use_wg?"prescribed_weight":"none");
   const pMode=rawPMode==="manual_weight"?"prescribed_weight":rawPMode;
   return `<div class="exerciseGrid">
-    <input class="exerciseNoInput ${row.superset_key?"supersetNo":""}" value="${esc(row.exercise_no||"")}" oninput="updateTrainingExercise('${row.id}','exercise_no',this.value)">
-    <div><div class="exerciseName">${esc(ex.name||row.source_name||"Ćwiczenie")}${row.superset_key?` <span class="supersetLabel">· superseria</span>`:""}</div><input class="exerciseNoteInput" placeholder="Uwagi trenera" value="${esc(row.notes||"")}" oninput="updateTrainingExercise('${row.id}','notes',this.value)"></div>
+    <input value="${esc(row.exercise_no||"")}" oninput="updateTrainingExercise('${row.id}','exercise_no',this.value)">
+    <div><div class="exerciseName">${esc(ex.name||row.source_name||"Ćwiczenie")}</div><input style="margin-top:6px" placeholder="Uwagi trenera" value="${esc(row.notes||"")}" oninput="updateTrainingExercise('${row.id}','notes',this.value)"></div>
     <input value="${esc(row.sets_text||"")}" oninput="updateTrainingExercise('${row.id}','sets_text',this.value)">
     <input value="${esc(row.reps_text||"")}" oninput="updateTrainingExercise('${row.id}','reps_text',this.value)">
     <input value="${esc(row.rest_text||"")}" oninput="updateTrainingExercise('${row.id}','rest_text',this.value)">
@@ -866,7 +526,7 @@ function exerciseRowHTML(row){
 
 function addExerciseHTML(trainingId){
   const options=STATE.exercises.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join("");
-  return `<div class="addBar"><select id="addExisting_${trainingId}"><option value="">Dodaj ćwiczenie z rejestru…</option>${options}</select><button class="btn secondary" onclick="addExerciseToTraining('${trainingId}')">+ Dodaj</button></div>`;
+  return `<div class="addBar"><select id="addExisting_${trainingId}"><option value="">Wybierz ćwiczenie z rejestru</option>${options}</select><button class="btn secondary" onclick="addExerciseToTraining('${trainingId}')">Dodaj</button><div class="small addExerciseHint">Nie ma ćwiczenia? Dodaj je w Rejestrze ćwiczeń.</div></div>`;
 }
 
 function progressionHTML(){
@@ -1302,30 +962,20 @@ async function createAthleteFromPrompt(){
 function renderAthletes(){
   const selected=STATE.athletes.find(a=>a.id===STATE.selectedAthleteId)||STATE.athletes[0]||null;
   if(selected&&!STATE.selectedAthleteId)STATE.selectedAthleteId=selected.id;
-  const query=norm(STATE.athleteQuery);
-  const athletes=STATE.athletes.filter(a=>!query||norm(`${a.name} ${a.client_key} ${a.status}`).includes(query));
   document.getElementById("main").innerHTML=`
-    <div class="topbar studioTopbar">
-      <div><div class="eyebrow">Podopieczni</div><div class="title">${selected?esc(selected.name):"Podopieczni"}</div><div class="screenMeta">${STATE.athletes.length} osób w opiece</div>${statusHTML()}</div>
-      <div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="saveAthletes()">Zapisz zmiany</button></div>
+    <div class="topbar">
+      <div><div class="eyebrow">Supabase</div><div class="title">Podopieczni</div>${statusHTML()}</div>
+      <div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="createAthleteFromPrompt()">Nowy podopieczny</button><button class="btn" onclick="saveAthletes()">Zapisz podopiecznych</button></div>
     </div>
-    <div class="athleteLayout">
-      <aside class="rosterPanel">
-        <div class="searchField rosterSearch"><span>⌕</span><input value="${esc(STATE.athleteQuery)}" placeholder="Szukaj podopiecznego…" oninput="STATE.athleteQuery=this.value;renderAthletes()"></div>
-        <div class="athleteList">${athletes.map(athleteCardHTML).join("")}</div>
-        <button class="rosterAdd" onclick="createAthleteFromPrompt()">+ Nowy podopieczny</button>
-      </aside>
-      ${selected?athleteDetailHTML(selected):`<div class="empty">Dodaj albo wybierz podopiecznego.</div>`}
-    </div>`;
+    ${selected?athleteDetailHTML(selected):`<div class="empty">Dodaj albo wybierz podopiecznego.</div>`}`;
 }
 
 function athleteCardHTML(a){
-  const active=activeAthletePlan(a.id);
-  const plan=active?.plans||STATE.plans.find(p=>p.id===active?.plan_id);
-  const state=statusMeta(a.status);
+  const links=getAthleteLinks(a.id);
   return `<button class="athleteCard ${a.id===STATE.selectedAthleteId?"active":""}" onclick="selectAthlete('${a.id}')">
-    ${avatarHTML(a.name,"sm")}
-    <span><span class="athleteName">${esc(a.name)}</span><span class="athleteCardMeta">${esc(plan?.name||state.label)}${plan?.weeks?` · ${esc(plan.weeks)} tyg.`:""}</span></span>
+    <div class="athleteName">${esc(a.name)}</div>
+    <div class="small">${esc(a.client_key)} · ${esc(a.status||"active")}</div>
+    <div style="margin-top:8px"><span class="pill blue">${links.length} planów</span>${activeAthletePlan(a.id)?`<span class="pill good">aktywny</span>`:""}</div>
   </button>`;
 }
 
@@ -1334,34 +984,16 @@ function athleteDetailHTML(a){
   const unassigned=STATE.plans.filter(p=>!links.some(l=>l.plan_id===p.id));
   const tab=STATE.athleteTab||"profile";
   return `<div class="athleteWorkspace">
-    ${athleteHeroHTML(a,links)}
+    ${athleteToolbarHTML(a,links)}
     ${athleteSummaryHTML(a)}
     <div class="athleteTabs">
       <button class="tab ${tab==="profile"?"active":""}" onclick="setAthleteTab('profile')">Profil</button>
-      <button class="tab ${tab==="plans"||tab==="preview"?"active":""}" onclick="setAthleteTab('plans')">Plany</button>
-      <button class="tab ${tab==="history"?"active":""}" onclick="setAthleteTab('history')">Historia</button>
+      <button class="tab ${tab==="history"?"active":""}" onclick="setAthleteTab('history')">Historia treningów</button>
       <button class="tab ${tab==="measurements"?"active":""}" onclick="setAthleteTab('measurements')">Pomiary</button>
+      <button class="tab ${tab==="preview"?"active":""}" onclick="setAthleteTab('preview')">Podgląd planu</button>
     </div>
     <div class="tabPane">
-      ${tab==="history"?athleteHistoryHTML(a):tab==="measurements"?athleteMeasurementsHTML(a):tab==="preview"?athletePreviewHTML(a):tab==="plans"?athletePlansHTML(a,links,unassigned):athleteProfileHTML(a,links,unassigned)}
-    </div>
-  </div>`;
-}
-
-function athleteHeroHTML(a,links){
-  const state=statusMeta(a.status);
-  const active=activeAthletePlan(a.id);
-  const plan=active?.plans||STATE.plans.find(p=>p.id===active?.plan_id);
-  return `<div class="athleteHero">
-    <div class="athleteHeroTop">
-      <div class="athleteHeroIdentity">${avatarHTML(a.name,"lg")}<div><div class="athleteHeroTitle">${esc(a.name)}</div><div class="small">${plan?`aktywny plan: ${esc(plan.name)}`:"brak aktywnego planu"}</div></div></div>
-      <span class="pill ${state.className}">${esc(state.label)}</span>
-    </div>
-    <div class="athleteFacts">
-      <div><span>Klucz klienta</span><strong>${esc(a.client_key||"-")}</strong></div>
-      <div><span>Przypisane plany</span><strong>${links.length}</strong></div>
-      <div><span>Częstotliwość</span><strong>${plan?"wg planu":"—"}</strong></div>
-      <div><span>Status planu</span><strong>${plan?esc(statusMeta(plan.status).label):"—"}</strong></div>
+      ${tab==="history"?athleteHistoryHTML(a):tab==="measurements"?athleteMeasurementsHTML(a):tab==="preview"?athletePreviewHTML(a):athleteProfileHTML(a,links,unassigned)}
     </div>
   </div>`;
 }
@@ -1392,10 +1024,9 @@ function athleteProfileHTML(a,links,unassigned){
       <div class="field"><label>Imię / nazwa</label><input value="${esc(a.name||"")}" oninput="updateAthlete('${a.id}','name',this.value)"></div>
       <div class="field"><label>client_key</label><input value="${esc(a.client_key||"")}" oninput="updateAthlete('${a.id}','client_key',this.value.toLowerCase())"></div>
       <div class="field"><label>Status</label><select onchange="updateAthlete('${a.id}','status',this.value)"><option value="active" ${a.status==="active"?"selected":""}>active</option><option value="paused" ${a.status==="paused"?"selected":""}>paused</option><option value="archived" ${a.status==="archived"?"selected":""}>archived</option></select></div>
-      <div class="field"><label>Liczba planów</label><input value="${links.length}" disabled></div>
+      <div class="field"><label>Notatki</label><input value="${esc(a.notes||"")}" oninput="updateAthlete('${a.id}','notes',this.value)"></div>
     </div>
-  </div>
-  <div class="section coachNotes"><div class="sectionTitle">Notatki trenera</div><textarea placeholder="Ważne informacje o podopiecznym…" oninput="updateAthlete('${a.id}','notes',this.value)">${esc(a.notes||"")}</textarea></div>`;
+  </div>${athletePlansHTML(a,links,unassigned)}`;
 }
 
 function athletePlansHTML(a,links,unassigned){
@@ -1430,17 +1061,17 @@ function previewPlanPickerHTML(a,context){
 
 function athleteSummaryHTML(a){
   const preview=STATE.athletePreview;
-  const current=preview?.athleteId===a.id?preview:null;
-  const sessions=current?.workoutSessions||[];
-  const setLogs=current?.workoutSetLogs||[];
+  if(!preview||preview.athleteId!==a.id)return "";
+  const sessions=preview.workoutSessions||[];
+  const setLogs=preview.workoutSetLogs||[];
+  const measurements=preview.measurements||[];
   const latestSession=[...sessions].sort((x,y)=>String(y.workout_date||"").localeCompare(String(x.workout_date||"")))[0];
-  const active=activeAthletePlan(a.id);
-  const plan=current?.plan||active?.plans||STATE.plans.find(p=>p.id===active?.plan_id);
+  const latestMeasurement=[...measurements].sort((x,y)=>String(y.measurement_date||"").localeCompare(String(x.measurement_date||"")))[0];
   return `<div class="metricStrip">
-    <div class="metricCard"><div class="metricLabel">Treningi</div><div class="metricValue">${sessions.length}</div><div class="small">${latestSession?`ostatni ${esc(shortDate(latestSession.workout_date))}`:"załaduj historię"}</div></div>
-    <div class="metricCard"><div class="metricLabel">Serie</div><div class="metricValue">${setLogs.filter(l=>l.done).length}</div><div class="small">wykonane</div></div>
-    <div class="metricCard"><div class="metricLabel">Śr. RPE</div><div class="metricValue">${avgRpe(setLogs)}</div><div class="small">z zapisanych serii</div></div>
-    <div class="metricCard"><div class="metricLabel">Aktywny plan</div><div class="metricValue metricPlan">${esc(plan?.name||"Brak")}</div><div class="small">${plan?`${esc(plan.weeks||"-")} tygodni`:"nieprzypisany"}</div></div>
+    <div class="metricCard"><div class="metricLabel">Treningi</div><div class="metricValue">${sessions.length}</div><div class="small">${latestSession?`ostatni ${esc(shortDate(latestSession.workout_date))}`:"brak historii"}</div></div>
+    <div class="metricCard"><div class="metricLabel">Serie</div><div class="metricValue">${setLogs.filter(l=>l.done).length}</div><div class="small">zapisane przez MonkeyPanel</div></div>
+    <div class="metricCard"><div class="metricLabel">Pomiary</div><div class="metricValue">${measurements.length}</div><div class="small">${latestMeasurement?`ostatni ${esc(shortDate(latestMeasurement.measurement_date))}`:"brak pomiarów"}</div></div>
+    <div class="metricCard"><div class="metricLabel">Plan</div><div class="metricValue" style="font-size:16px">${esc(preview.plan.name)}</div><div class="small">${esc(preview.plan.status||"")} · ${esc(preview.plan.weeks||"-")} tyg.</div></div>
   </div>`;
 }
 
@@ -1461,75 +1092,71 @@ function athletePlanRowHTML(a,link){
 
 function athleteHistoryHTML(a){
   const preview=STATE.athletePreview;
-  if(!preview||preview.athleteId!==a.id)return `${previewPlanPickerHTML(a,"historyPlan")}<div class="panelNotice">Wybierz plan, żeby załadować historię treningów.</div>`;
+  if(!preview||preview.athleteId!==a.id)return `<div class="section"><div class="sectionTitle">Historia treningów</div><div class="panelNotice">Wybierz plan w selektorze nad zakładkami, żeby załadować treningi.</div></div>`;
   const sessions=preview.workoutSessions||[];
   const setLogs=preview.workoutSetLogs||[];
-  return `${previewPlanPickerHTML(a,"historyPlan")}<div class="historyHeader">
+  return `<div class="section" style="margin-top:14px">
     <div class="detailHead">
-      <div><div class="eyebrow">${esc(a.name)} · historia treningów</div><div class="title historyScreenTitle">${esc(preview.plan.name)}</div></div>
+      <div><div class="sectionTitle" style="margin-bottom:4px">Historia treningów</div><div class="small">${esc(preview.plan.name)} · ${sessions.length} treningów · ${setLogs.length} serii</div></div>
       <div class="historyStats">
         <span class="pill blue">${sessions.length} sesji</span>
-        <span class="pill good">${setLogs.filter(l=>l.done).length} serii</span>
+        <span class="pill good">${setLogs.filter(l=>l.done).length} wykonanych serii</span>
       </div>
     </div>
-  </div>${workoutHistoryHTML(preview)}`;
+    ${workoutHistoryHTML(preview)}
+  </div>`;
 }
 
 function athleteMeasurementsHTML(a){
   const preview=STATE.athletePreview;
-  if(!preview||preview.athleteId!==a.id)return `${previewPlanPickerHTML(a,"measurementsPlan")}<div class="panelNotice">Wybierz plan, żeby załadować pomiary.</div>`;
-  return `${previewPlanPickerHTML(a,"measurementsPlan")}<div class="section">${measurementHistoryHTML(preview)}</div>`;
+  if(!preview||preview.athleteId!==a.id)return `<div class="section"><div class="sectionTitle">Pomiary</div><div class="panelNotice">Wybierz plan w selektorze nad zakładkami, żeby załadować pomiary.</div></div>`;
+  return `<div class="section" style="margin-top:14px">${measurementHistoryHTML(preview)}</div>`;
 }
 
 function workoutHistoryHTML(preview){
   const sessions=[...(preview.workoutSessions||[])].sort((a,b)=>String(b.workout_date||"").localeCompare(String(a.workout_date||""))||String(b.workout_id||"").localeCompare(String(a.workout_id||"")));
   if(!sessions.length)return `<div class="historyPanel"><div class="historyTitle">Wykonane treningi</div><div class="empty">Brak zapisanych treningów dla tego planu.</div></div>`;
   const selectedId=STATE.selectedWorkoutSessionId&&sessions.some(s=>s.id===STATE.selectedWorkoutSessionId)?STATE.selectedWorkoutSessionId:sessions[0].id;
-  return `<div class="historyGrid">
-    <div class="historyPanel">
-      <div class="historyTitle">Wykonane treningi</div>
-      <div class="tableWrap">
-        <table class="dataTable sessionsTable">
-          <thead><tr><th>Data</th><th>Tydz.</th><th>Trening</th><th>Status</th><th>RPE</th><th>Serie</th></tr></thead>
-          <tbody>${sessions.map(s=>sessionHistoryRowHTML(preview,s,selectedId)).join("")}</tbody>
-        </table>
-      </div>
+  return `<div class="historyPanel">
+    <div class="historyTitle">Wykonane treningi</div>
+    <div class="tableWrap">
+      <table class="dataTable sessionsTable">
+        <thead><tr><th>Data</th><th>Tydz.</th><th>Trening</th><th>Status</th><th>Ćwiczenia</th><th>Śr. RPE</th><th>Serie</th><th>Notatka</th><th></th></tr></thead>
+        <tbody>${sessions.map(s=>sessionHistoryRowHTML(preview,s,selectedId)).join("")}</tbody>
+      </table>
     </div>
-    <div class="historyPanel sessionDetailsPanel">${sessionDetailsPanelHTML(preview,selectedId)}</div>
+    ${sessionDetailsPanelHTML(preview,selectedId)}
   </div>`;
 }
 
 function sessionHistoryRowHTML(preview,s,selectedId){
   const logs=workoutLogsForSession(preview,s.id);
   const doneSets=logs.filter(l=>l.done).length;
-  const state=sessionStatusMeta(s.status);
+  const exercises=new Set(logs.map(l=>`${l.exercise_no||""}|${l.exercise_name||""}`)).size;
+  const completed=s.completed_exercises??exercises;
+  const total=s.total_exercises??exercises;
+  const note=s.session_note||logs.map(l=>l.note).find(Boolean)||"";
   return `<tr class="${s.id===selectedId?"sessionRowActive":""}">
-    <td><button class="rowSelect" onclick="selectWorkoutSession('${s.id}')">${esc(humanDate(s.performed_date||s.workout_date))}</button></td>
+    <td>${esc(shortDate(s.performed_date||s.workout_date))}</td>
     <td>${esc(s.week_number||"-")}</td>
-    <td><strong>${esc(s.workout_name||s.workout_id||s.session_id)}</strong></td>
-    <td><span class="pill ${state.className}">${esc(state.label)}</span></td>
+    <td><strong>${esc(s.workout_name||s.workout_id||s.session_id)}</strong><div class="small">${esc(s.session_id||"")}</div></td>
+    <td><span class="pill good">${esc(statusLabel(s.status))}</span></td>
+    <td>${esc(completed)}/${esc(total)}</td>
     <td>${esc(avgRpe(logs))}</td>
-    <td>${doneSets}</td>
+    <td>${doneSets} serii</td>
+    <td>${esc(note||"-")}</td>
+    <td class="tableActionCell"><button class="miniBtn" onclick="selectWorkoutSession('${s.id}')">Pokaż szczegóły</button></td>
   </tr>`;
 }
 
 function sessionDetailsPanelHTML(preview,sessionId){
   const session=(preview.workoutSessions||[]).find(s=>s.id===sessionId);
-  if(!session)return `<div class="panelNotice">Wybierz trening, żeby zobaczyć zapisane serie.</div>`;
+  if(!session)return `<div class="sessionDetailsPanel panelNotice">Wybierz trening, żeby zobaczyć zapisane serie.</div>`;
   const logs=workoutLogsForSession(preview,sessionId);
-  const groups=new Map();
-  for(const log of logs){
-    const key=`${log.exercise_no||""}|${log.exercise_name||""}`;
-    if(!groups.has(key))groups.set(key,[]);
-    groups.get(key).push(log);
-  }
-  const note=session.session_note||logs.map(log=>log.note).find(Boolean)||"";
-  return `<div class="sessionDetailHead"><div class="historyTitle">${esc(session.workout_name||session.workout_id||session.session_id)} <span class="small">· ${esc(humanDate(session.performed_date||session.workout_date))}</span></div><div class="small">zapisane serie z aplikacji podopiecznego</div></div>
-    <div class="sessionExerciseList">${[...groups.values()].map(group=>{
-      const first=group[0]||{};
-      return `<div class="sessionExercise"><strong>${esc(first.exercise_no||"")} · ${esc(first.exercise_name||"Ćwiczenie")}</strong><div class="setChips">${group.map(setLogChipHTML).join("")}</div></div>`;
-    }).join("")||`<div class="small">Brak zapisanych serii.</div>`}</div>
-    ${note?`<div class="athleteNote">Notatka podopiecznego: „${esc(note)}”</div>`:""}`;
+  return `<div class="sessionDetailsPanel">
+    <div class="historyTitle">Szczegóły: ${esc(session.workout_name||session.workout_id||session.session_id)} <span class="small">· ${esc(shortDate(session.performed_date||session.workout_date))}</span></div>
+    ${setLogTableHTML(logs)}
+  </div>`;
 }
 
 function setLogTableHTML(logs){
@@ -1724,20 +1351,8 @@ async function loadAthletePreview(athleteId,planId){
    EXERCISE REGISTRY
 ========================= */
 function renderExercises(){
-  const categories=[...new Set(STATE.exercises.map(e=>e.default_category).filter(Boolean))].sort();
-  const query=norm(STATE.exerciseQuery);
-  const exercises=STATE.exercises.filter(e=>{
-    const matchesQuery=!query||norm(`${e.name} ${e.default_category} ${e.notes}`).includes(query);
-    const matchesCategory=STATE.exerciseCategory==="all"||e.default_category===STATE.exerciseCategory;
-    return matchesQuery&&matchesCategory;
-  });
-  document.getElementById("main").innerHTML=`
-    <div class="topbar studioTopbar">
-      <div><div class="eyebrow">Biblioteka</div><div class="title">Rejestr ćwiczeń</div><div class="screenMeta">${STATE.exercises.length} ćwiczeń</div>${statusHTML()}</div>
-      <div class="topbarActions"><div class="searchField"><span>⌕</span><input value="${esc(STATE.exerciseQuery)}" placeholder="Szukaj ćwiczenia…" oninput="STATE.exerciseQuery=this.value;renderExercises()"></div><button class="btn good" onclick="saveExercises()">Zapisz zmiany</button></div>
-    </div>
-    <div class="filterPills"><button class="filterPill ${STATE.exerciseCategory==="all"?"active":""}" onclick="STATE.exerciseCategory='all';renderExercises()">Wszystkie</button>${categories.map(category=>`<button class="filterPill ${STATE.exerciseCategory===category?"active":""}" onclick="STATE.exerciseCategory='${esc(category)}';renderExercises()">${esc(category)}</button>`).join("")}</div>
-    <div class="section registrySection"><div class="tableWrap"><table class="registryTable"><thead><tr><th>Ćwiczenie</th><th>Kategoria</th><th>Tryb</th><th>Wideo</th><th>Notatki</th><th></th></tr></thead><tbody>${exercises.map(e=>`<tr><td><input class="registryName" value="${esc(e.name)}" oninput="updateExercise('${e.id}','name',this.value)"></td><td><input value="${esc(e.default_category||"")}" oninput="updateExercise('${e.id}','default_category',this.value)"></td><td><select onchange="updateExercise('${e.id}','default_mode',this.value)"><option value="sets" ${e.default_mode==="sets"?"selected":""}>serie</option><option value="time" ${e.default_mode==="time"?"selected":""}>czas</option><option value="done" ${e.default_mode==="done"?"selected":""}>wykonanie</option></select></td><td><input value="${esc(e.youtube_url||"")}" placeholder="YouTube ↗" oninput="updateExercise('${e.id}','youtube_url',this.value)"></td><td><input value="${esc(e.notes||"")}" oninput="updateExercise('${e.id}','notes',this.value)"></td><td><button class="deleteX" onclick="deleteExercise('${e.id}')">×</button></td></tr>`).join("")}</tbody></table></div><div class="addBar registryAdd"><input id="newExerciseName" placeholder="Nazwa nowego ćwiczenia"><button class="btn secondary" onclick="createExerciseFromRegistry()">+ Dodaj</button></div></div>`;
+  document.getElementById("main").innerHTML=`<div class="topbar"><div><div class="eyebrow">Registry</div><div class="title">Ćwiczenia</div>${statusHTML()}</div><div class="btnRow"><button class="btn secondary" onclick="reloadAll()">Odśwież</button><button class="btn good" onclick="saveExercises()">Zapisz registry</button></div></div>
+  <div class="section"><table class="registryTable"><thead><tr><th>Nazwa</th><th>YouTube</th><th>Tryb</th><th>Kategoria</th><th>Notatki</th><th></th></tr></thead><tbody>${STATE.exercises.map(e=>`<tr><td><input value="${esc(e.name)}" oninput="updateExercise('${e.id}','name',this.value)"></td><td><input value="${esc(e.youtube_url||"")}" oninput="updateExercise('${e.id}','youtube_url',this.value)"></td><td><select onchange="updateExercise('${e.id}','default_mode',this.value)"><option value="sets" ${e.default_mode==="sets"?"selected":""}>sets</option><option value="time" ${e.default_mode==="time"?"selected":""}>time</option><option value="done" ${e.default_mode==="done"?"selected":""}>done</option></select></td><td><input value="${esc(e.default_category||"")}" oninput="updateExercise('${e.id}','default_category',this.value)"></td><td><input value="${esc(e.notes||"")}" oninput="updateExercise('${e.id}','notes',this.value)"></td><td><button class="deleteX" onclick="deleteExercise('${e.id}')">×</button></td></tr>`).join("")}</tbody></table><div class="btnRow" style="margin-top:12px"><input id="newExerciseName" placeholder="Nowe ćwiczenie"><button class="btn secondary" onclick="createExerciseFromRegistry()">+ Dodaj</button></div></div>`;
 }
 async function createExerciseFromRegistry(){
   const name=document.getElementById("newExerciseName").value.trim();
