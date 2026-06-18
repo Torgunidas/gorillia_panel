@@ -169,7 +169,7 @@ input:disabled{background:var(--card-alt);color:var(--muted)}
 .builderActions{justify-content:flex-end}
 .builderSection{min-width:0}
 .training{overflow:auto;margin-bottom:14px}
-.trainingHead{min-width:1080px;display:grid;grid-template-columns:minmax(0,1fr) auto 30px;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border-bottom:1px solid var(--line)}
+.trainingHead{min-width:1120px;display:grid;grid-template-columns:minmax(0,1fr) auto auto 30px;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border-bottom:1px solid var(--line)}
 .trainingIdentity{display:flex;align-items:center;gap:12px}
 .trainingNameInput,.trainingFocusInput{width:auto;min-height:28px;padding:2px 6px;border:0;box-shadow:none;background:transparent}
 .trainingNameInput{max-width:260px;font-size:14.5px;font-weight:700}
@@ -177,7 +177,7 @@ input:disabled{background:var(--card-alt);color:var(--muted)}
 .trainingNameInput:focus,.trainingFocusInput:focus{border:0;box-shadow:0 0 0 2px var(--accent-soft)}
 .trainingCount{color:var(--muted);font-size:11.5px}
 .trainingDelete{opacity:.5}
-.exerciseGrid{min-width:1080px;grid-template-columns:46px minmax(220px,1.3fr) 64px 78px 82px 86px 78px 144px 86px 82px 28px;gap:7px;padding:7px 13px;border-top:1px solid var(--row-line);align-items:center;font-variant-numeric:tabular-nums}
+.exerciseGrid{min-width:1120px;grid-template-columns:46px minmax(220px,1.3fr) 64px 78px 82px 86px 78px 144px 86px 104px 28px;gap:7px;padding:7px 13px;border-top:1px solid var(--row-line);align-items:center;font-variant-numeric:tabular-nums}
 .exerciseGrid.header{padding-top:8px;padding-bottom:8px;background:var(--card-alt);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .exerciseGrid:not(.header):hover{background:#fafbf9}
 .exerciseGrid input,.exerciseGrid select{min-height:30px;padding:4px 7px;border-color:transparent;background:transparent}
@@ -186,6 +186,18 @@ input:disabled{background:var(--card-alt);color:var(--muted)}
 .exerciseNoteInput{display:block;width:100%;margin-top:2px;color:var(--muted);font-size:11px}
 .exerciseNoInput{color:var(--faint);font-weight:700}
 .exerciseNoInput.supersetNo,.supersetLabel{color:var(--accent);font-weight:700}
+.supersetActions{display:flex;align-items:center;gap:6px}
+.supersetActions .miniBtn{min-height:30px}
+.supersetActions .miniBtn:disabled{opacity:.42;cursor:not-allowed}
+.exerciseGrid.supersetRow{position:relative;background:#f6faf7}
+.exerciseGrid.supersetRow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.exerciseGrid.supersetStart{border-top-color:var(--accent-line)}
+.exerciseGrid.supersetEnd{border-bottom:1px solid var(--accent-line)}
+.supersetLabel{display:inline-flex;align-items:center;gap:4px;margin-left:5px;font-size:10.5px}
+.supersetPick{height:30px;display:flex;align-items:center;gap:6px;padding:0 7px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.supersetPick:hover{border-color:var(--accent-line);color:var(--accent-ink)}
+.supersetPick.grouped{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-ink)}
+.supersetPick input{width:14px;height:14px;min-height:0;padding:0;margin:0;accent-color:var(--accent);box-shadow:none}
 .addBar{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:10px 13px;background:var(--card-head);border-top:1px solid var(--line)}
 .deleteX{width:28px;height:28px;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--faint);font-size:16px;cursor:pointer}
 .deleteX:hover{border-color:#eadad7;background:#fbf3f2;color:#9a5148}
@@ -366,6 +378,7 @@ const STATE = {
   progressionSets:[],
   weekNotes:[],
   resources:[],
+  supersetSelection:{},
   planQuery:"",
   athleteQuery:"",
   exerciseQuery:"",
@@ -464,7 +477,7 @@ async function loadPlan(id){
       }else STATE.progressionSets=[];
       absorbStatusSetsIntoWeekNotes();
     }else{STATE.progressionExercises=[];STATE.progressionSets=[];STATE.weekNotes=[];}
-    STATE.screen="builder";STATE.tab="structure";STATE.dirty=false;STATE.lastError="";setStatus("Plan załadowany","ok");render();
+    STATE.screen="builder";STATE.tab="structure";STATE.supersetSelection={};STATE.dirty=false;STATE.lastError="";setStatus("Plan załadowany","ok");render();
   }catch(err){setError(err);}
 }
 
@@ -488,6 +501,96 @@ function getTrainingRows(trainingId){
   return STATE.trainingExercises
     .filter(row=>row.training_id===trainingId)
     .sort((a,b)=>(a.order_index||0)-(b.order_index||0));
+}
+
+function selectedSupersetRows(trainingId){
+  const selected=STATE.supersetSelection||{};
+  return getTrainingRows(trainingId).filter(row=>selected[row.id]);
+}
+
+function supersetKeysForRows(rows){
+  const keys=[];
+  rows.forEach(row=>{
+    const key=String(row.superset_key||"").trim().toLowerCase();
+    if(key&&!keys.includes(key))keys.push(key);
+  });
+  return keys;
+}
+
+function supersetDisplayLabel(row,rows){
+  if(row.group_label)return row.group_label;
+  const key=String(row.superset_key||"").trim().toLowerCase();
+  const index=supersetKeysForRows(rows).indexOf(key);
+  return `Superseria ${index>=0?index+1:1}`;
+}
+
+function supersetMemberLabel(row,rows){
+  const key=String(row.superset_key||"").trim().toLowerCase();
+  const grouped=rows.filter(item=>String(item.superset_key||"").trim().toLowerCase()===key);
+  const index=grouped.findIndex(item=>item.id===row.id);
+  return String.fromCharCode(65+Math.max(0,index));
+}
+
+function toggleSupersetSelection(id,checked){
+  STATE.supersetSelection=STATE.supersetSelection||{};
+  if(checked)STATE.supersetSelection[id]=true;
+  else delete STATE.supersetSelection[id];
+  render();
+}
+
+function clearSupersetSelection(trainingId){
+  const ids=new Set(getTrainingRows(trainingId).map(row=>row.id));
+  Object.keys(STATE.supersetSelection||{}).forEach(id=>{if(ids.has(id))delete STATE.supersetSelection[id]});
+}
+
+function nextSupersetKey(rows){
+  const used=new Set(rows.map(row=>String(row.superset_key||"").trim().toLowerCase()).filter(Boolean));
+  let number=1;
+  while(used.has(`ss${number}`))number++;
+  return `ss${number}`;
+}
+
+function nextSupersetLabel(rows){
+  const used=new Set(rows.filter(row=>String(row.superset_key||"").trim()).map(row=>supersetDisplayLabel(row,rows)));
+  let number=1;
+  while(used.has(`Superseria ${number}`))number++;
+  return `Superseria ${number}`;
+}
+
+function connectSelectedSuperset(trainingId){
+  const rows=getTrainingRows(trainingId),selected=selectedSupersetRows(trainingId);
+  if(selected.length<2){showToast("Zaznacz co najmniej dwa ćwiczenia");return}
+  if(selected.some(row=>(row.mode||"sets")!=="sets")){showToast("Superseria może zawierać tylko ćwiczenia typu sets");return}
+  if(selected.some(row=>String(row.superset_key||"").trim())){showToast("Najpierw rozłącz zaznaczone ćwiczenia");return}
+  const selectedIds=new Set(selected.map(row=>row.id));
+  const firstIndex=Math.min(...selected.map(row=>rows.findIndex(item=>item.id===row.id)));
+  const selectedInOrder=rows.filter(row=>selectedIds.has(row.id));
+  const remaining=rows.filter(row=>!selectedIds.has(row.id));
+  remaining.splice(firstIndex,0,...selectedInOrder);
+  remaining.forEach((row,index)=>{row.order_index=index+1});
+  const key=nextSupersetKey(rows);
+  const label=nextSupersetLabel(rows);
+  selectedInOrder.forEach(row=>{row.superset_key=key;row.group_label=label});
+  clearSupersetSelection(trainingId);
+  markDirty();
+  showToast(`Połączono ${selectedInOrder.length} ćwiczenia`);
+  render();
+}
+
+function disconnectSelectedSuperset(trainingId){
+  const rows=getTrainingRows(trainingId),selected=selectedSupersetRows(trainingId);
+  const keys=new Set(selected.map(row=>String(row.superset_key||"").trim().toLowerCase()).filter(Boolean));
+  if(!keys.size){showToast("Zaznacz ćwiczenie należące do superserii");return}
+  rows.forEach(row=>{
+    if(keys.has(String(row.superset_key||"").trim().toLowerCase())){
+      row.superset_key=null;
+      row.group_label=null;
+    }
+  });
+  clearSupersetSelection(trainingId);
+  markDirty();
+  showToast(keys.size===1?"Superseria rozłączona":"Superserie rozłączone");
+  render();
 }
 
 function getProgressionCandidates(){
@@ -1040,21 +1143,29 @@ function structureHTML(){
 
 function trainingHTML(t){
   const rows=getTrainingRows(t.id);
+  const selected=selectedSupersetRows(t.id);
+  const selectedGroups=new Set(selected.map(row=>String(row.superset_key||"").trim().toLowerCase()).filter(Boolean));
   return `<div class="training">
-    <div class="trainingHead"><div class="trainingIdentity"><input class="trainingNameInput" value="${esc(t.name)}" oninput="updateTraining('${t.id}','name',this.value)"><input class="trainingFocusInput" placeholder="Klatka · plecy · barki" value="${esc(t.focus||"")}" oninput="updateTraining('${t.id}','focus',this.value)"></div><div class="trainingCount">${rows.length} ćwiczeń</div><button class="deleteX trainingDelete" title="Usuń trening" onclick="deleteTraining('${t.id}')">×</button></div>
-    <div class="exerciseGrid header"><div>Nr</div><div>Ćwiczenie</div><div>Serie</div><div>Powt.</div><div>Przerwa</div><div>Ciężar</div><div>Tempo</div><div>Progresja</div><div>Typ</div><div>Superset</div><div></div></div>
-    ${rows.map(exerciseRowHTML).join("")||`<div class="empty" style="margin:12px">Brak ćwiczeń</div>`}
+    <div class="trainingHead"><div class="trainingIdentity"><input class="trainingNameInput" value="${esc(t.name)}" oninput="updateTraining('${t.id}','name',this.value)"><input class="trainingFocusInput" placeholder="Klatka · plecy · barki" value="${esc(t.focus||"")}" oninput="updateTraining('${t.id}','focus',this.value)"></div><div class="supersetActions"><button class="miniBtn good" onclick="connectSelectedSuperset('${t.id}')" ${selected.length<2?"disabled":""}>Połącz w superserię</button><button class="miniBtn" onclick="disconnectSelectedSuperset('${t.id}')" ${!selectedGroups.size?"disabled":""}>Rozłącz</button></div><div class="trainingCount">${rows.length} ćwiczeń</div><button class="deleteX trainingDelete" title="Usuń trening" onclick="deleteTraining('${t.id}')">×</button></div>
+    <div class="exerciseGrid header"><div>Nr</div><div>Ćwiczenie</div><div>Serie</div><div>Powt.</div><div>Przerwa</div><div>Ciężar</div><div>Tempo</div><div>Progresja</div><div>Typ</div><div>Superseria</div><div></div></div>
+    ${rows.map((row,index)=>exerciseRowHTML(row,index,rows)).join("")||`<div class="empty" style="margin:12px">Brak ćwiczeń</div>`}
     ${addExerciseHTML(t.id)}
   </div>`;
 }
 
-function exerciseRowHTML(row){
+function exerciseRowHTML(row,index,rows){
   const ex=row.exercises||STATE.exercises.find(e=>e.id===row.exercise_id)||{};
   const rawPMode=row.progression_mode||(row.use_wg?"prescribed_weight":"none");
   const pMode=rawPMode==="manual_weight"?"prescribed_weight":rawPMode;
-  return `<div class="exerciseGrid">
+  const key=String(row.superset_key||"").trim().toLowerCase();
+  const previousKey=String(rows[index-1]?.superset_key||"").trim().toLowerCase();
+  const nextKey=String(rows[index+1]?.superset_key||"").trim().toLowerCase();
+  const groupLabel=key?supersetDisplayLabel(row,rows):"";
+  const memberLabel=key?supersetMemberLabel(row,rows):"";
+  const selected=!!STATE.supersetSelection?.[row.id];
+  return `<div class="exerciseGrid ${key?"supersetRow":""} ${key&&key!==previousKey?"supersetStart":""} ${key&&key!==nextKey?"supersetEnd":""}" data-training-exercise-id="${esc(row.id)}" data-exercise-no="${esc(row.exercise_no||"")}">
     <input class="exerciseNoInput ${row.superset_key?"supersetNo":""}" value="${esc(row.exercise_no||"")}" oninput="updateTrainingExercise('${row.id}','exercise_no',this.value)">
-    <div><div class="exerciseName">${esc(ex.name||row.source_name||"Ćwiczenie")}${row.superset_key?` <span class="supersetLabel">· superseria</span>`:""}</div><input class="exerciseNoteInput" placeholder="Uwagi trenera" value="${esc(row.notes||"")}" oninput="updateTrainingExercise('${row.id}','notes',this.value)"></div>
+    <div><div class="exerciseName">${esc(ex.name||row.source_name||"Ćwiczenie")}${key?` <span class="supersetLabel">· ${esc(groupLabel)} · ${memberLabel}</span>`:""}</div><input class="exerciseNoteInput" placeholder="Uwagi trenera" value="${esc(row.notes||"")}" oninput="updateTrainingExercise('${row.id}','notes',this.value)"></div>
     <input value="${esc(row.sets_text||"")}" oninput="updateTrainingExercise('${row.id}','sets_text',this.value)">
     <input value="${esc(row.reps_text||"")}" oninput="updateTrainingExercise('${row.id}','reps_text',this.value)">
     <input value="${esc(row.rest_text||"")}" oninput="updateTrainingExercise('${row.id}','rest_text',this.value)">
@@ -1062,7 +1173,7 @@ function exerciseRowHTML(row){
     <input value="${esc(row.tempo_text||"")}" placeholder="2200" oninput="updateTrainingExercise('${row.id}','tempo_text',this.value)">
     <select onchange="updateTrainingExercise('${row.id}','progression_mode',this.value,true)"><option value="none" ${pMode==="none"?"selected":""}>brak</option><option value="prescribed_weight" ${pMode==="prescribed_weight"||pMode==="manual_weight"?"selected":""}>progresja tygodniowa</option></select>
     <select onchange="updateTrainingExercise('${row.id}','mode',this.value)"><option value="sets" ${row.mode==="sets"?"selected":""}>sets</option><option value="time" ${row.mode==="time"?"selected":""}>time</option><option value="done" ${row.mode==="done"?"selected":""}>done</option></select>
-    <input value="${esc(row.superset_key||"")}" placeholder="SS1" oninput="updateTrainingExercise('${row.id}','superset_key',this.value)">
+    <label class="supersetPick ${key?"grouped":""}"><input type="checkbox" ${selected?"checked":""} onchange="toggleSupersetSelection('${row.id}',this.checked)"><span>${key?`${esc(groupLabel)} · ${memberLabel}`:"Wybierz"}</span></label>
     <button class="deleteX" onclick="deleteTrainingExercise('${row.id}')">×</button>
   </div>`;
 }
@@ -1805,16 +1916,18 @@ function clientWorkoutPreviewHTML(preview,t,week){
   return `<div class="clientWorkout">
     <strong>${esc(t.name)}</strong>
     <div class="small">${esc(t.focus||"")}</div>
-    ${rows.map(row=>clientExercisePreviewHTML(preview,row,week)).join("")||`<div class="small">Brak ćwiczeń.</div>`}
+    ${rows.map((row,index)=>clientExercisePreviewHTML(preview,row,week,rows,index)).join("")||`<div class="small">Brak ćwiczeń.</div>`}
   </div>`;
 }
 
-function clientExercisePreviewHTML(preview,row,week){
+function clientExercisePreviewHTML(preview,row,week,rows,index){
   const ex=row.exercises||{};
   const rx=progressionPreviewFor(preview,row,week);
   const base=[row.sets_text,row.reps_text,row.rest_text].filter(Boolean).join(" · ");
+  const key=String(row.superset_key||"").trim().toLowerCase();
+  const member=key?String.fromCharCode(65+rows.filter((item,rowIndex)=>rowIndex<=index&&String(item.superset_key||"").trim().toLowerCase()===key).length-1):"";
   return `<div class="clientExercise">
-    <div><strong>${esc(row.exercise_no||"")} ${esc(ex.name||row.source_name||"Ćwiczenie")}</strong></div>
+    <div><strong>${esc(row.exercise_no||"")} ${esc(ex.name||row.source_name||"Ćwiczenie")}</strong>${key?` <span class="pill good">Superseria · ${member}</span>`:""}</div>
     <div class="small">${esc(base||row.notes||"")}</div>
     ${rx}
   </div>`;
