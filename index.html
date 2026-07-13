@@ -169,7 +169,7 @@ input:disabled{background:var(--card-alt);color:var(--muted)}
 .builderActions{justify-content:flex-end}
 .builderSection{min-width:0}
 .training{overflow:auto;margin-bottom:14px}
-.trainingHead{min-width:1120px;display:grid;grid-template-columns:minmax(0,1fr) auto auto 30px;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border-bottom:1px solid var(--line)}
+.trainingHead{min-width:1180px;display:grid;grid-template-columns:minmax(0,1fr) auto auto 30px;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border-bottom:1px solid var(--line)}
 .trainingIdentity{display:flex;align-items:center;gap:12px}
 .trainingNameInput,.trainingFocusInput{width:auto;min-height:28px;padding:2px 6px;border:0;box-shadow:none;background:transparent}
 .trainingNameInput{max-width:260px;font-size:14.5px;font-weight:700}
@@ -177,15 +177,28 @@ input:disabled{background:var(--card-alt);color:var(--muted)}
 .trainingNameInput:focus,.trainingFocusInput:focus{border:0;box-shadow:0 0 0 2px var(--accent-soft)}
 .trainingCount{color:var(--muted);font-size:11.5px}
 .trainingDelete{opacity:.5}
-.exerciseGrid{min-width:1120px;grid-template-columns:46px minmax(220px,1.3fr) 64px 78px 82px 86px 78px 144px 86px 104px 28px;gap:7px;padding:7px 13px;border-top:1px solid var(--row-line);align-items:center;font-variant-numeric:tabular-nums}
+.exerciseGrid{min-width:1180px;grid-template-columns:96px minmax(220px,1.3fr) 64px 78px 82px 86px 78px 144px 86px 104px 28px;gap:7px;padding:7px 13px;border-top:1px solid var(--row-line);align-items:center;font-variant-numeric:tabular-nums}
 .exerciseGrid.header{padding-top:8px;padding-bottom:8px;background:var(--card-alt);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .exerciseGrid:not(.header):hover{background:#fafbf9}
+.exerciseGrid.dragging{opacity:.5}
+.exerciseGrid.dropBefore{box-shadow:inset 0 3px 0 var(--accent)}
+.exerciseGrid.dropAfter{box-shadow:inset 0 -3px 0 var(--accent)}
 .exerciseGrid input,.exerciseGrid select{min-height:30px;padding:4px 7px;border-color:transparent;background:transparent}
 .exerciseGrid input:hover,.exerciseGrid select:hover,.exerciseGrid input:focus,.exerciseGrid select:focus{background:var(--card);border-color:var(--line)}
 .exerciseName{font-size:12.5px;font-weight:600}
 .exerciseNoteInput{display:block;width:100%;margin-top:2px;color:var(--muted);font-size:11px}
-.exerciseNoInput{color:var(--faint);font-weight:700}
-.exerciseNoInput.supersetNo,.supersetLabel{color:var(--accent);font-weight:700}
+.exerciseOrderCell{display:grid;grid-template-columns:24px 32px 24px;align-items:center;justify-content:start;gap:4px}
+.exerciseDragHandle,.exerciseMoveButton{display:grid;place-items:center;padding:0;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--faint);cursor:pointer}
+.exerciseDragHandle{width:24px;height:30px;font-size:16px;line-height:1;cursor:grab}
+.exerciseDragHandle:active{cursor:grabbing}
+.exerciseDragHandle:hover,.exerciseMoveButton:hover{border-color:var(--line);background:var(--card-alt);color:var(--ink)}
+.exerciseNoBadge{display:grid;place-items:center;min-width:32px;height:30px;border-radius:6px;background:var(--card-alt);color:var(--faint);font-size:11px;font-weight:700}
+.exerciseNoBadge.supersetNo{background:var(--accent-soft);color:var(--accent)}
+.exerciseMoveButtons{display:grid;grid-template-rows:14px 14px;gap:2px}
+.exerciseMoveButton{width:24px;height:14px;font-size:9px;line-height:1}
+.exerciseMoveButton:disabled{opacity:.25;cursor:not-allowed}
+.exerciseMoveButton:disabled:hover{border-color:transparent;background:transparent;color:var(--faint)}
+.supersetLabel{color:var(--accent);font-weight:700}
 .supersetActions{display:flex;align-items:center;gap:6px}
 .supersetActions .miniBtn{min-height:30px}
 .supersetActions .miniBtn:disabled{opacity:.42;cursor:not-allowed}
@@ -379,6 +392,7 @@ const STATE = {
   weekNotes:[],
   resources:[],
   supersetSelection:{},
+  draggedExerciseId:null,
   planQuery:"",
   athleteQuery:"",
   exerciseQuery:"",
@@ -477,7 +491,10 @@ async function loadPlan(id){
       }else STATE.progressionSets=[];
       absorbStatusSetsIntoWeekNotes();
     }else{STATE.progressionExercises=[];STATE.progressionSets=[];STATE.weekNotes=[];}
-    STATE.screen="builder";STATE.tab="structure";STATE.supersetSelection={};STATE.dirty=false;STATE.lastError="";setStatus("Plan załadowany","ok");render();
+    const structure=normalizeAllTrainingStructures({detectLegacy:true});
+    STATE.screen="builder";STATE.tab="structure";STATE.supersetSelection={};STATE.dirty=structure.changed;STATE.lastError="";
+    setStatus(structure.legacyMigrated?"Wykryto starsze superserie — zapisz plan, aby je ujednolicić":structure.changed?"Kolejność została uporządkowana — zapisz plan":"Plan załadowany","ok");
+    render();
   }catch(err){setError(err);}
 }
 
@@ -500,7 +517,209 @@ function getCurrentPlan(){
 function getTrainingRows(trainingId){
   return STATE.trainingExercises
     .filter(row=>row.training_id===trainingId)
-    .sort((a,b)=>(a.order_index||0)-(b.order_index||0));
+    .sort((a,b)=>(Number(a.order_index)||0)-(Number(b.order_index)||0)||String(a.id).localeCompare(String(b.id)));
+}
+
+function supersetKey(row){
+  return String(row?.superset_key||"").trim().toLowerCase();
+}
+
+function supersetMemberCode(index){
+  let value=Math.max(0,Number(index)||0)+1,label="";
+  while(value>0){
+    value--;
+    label=String.fromCharCode(65+(value%26))+label;
+    value=Math.floor(value/26);
+  }
+  return label;
+}
+
+function legacyExerciseNumber(value){
+  const match=String(value||"").trim().toLowerCase().match(/^(\d+)([a-z])?$/);
+  return match?{base:match[1],suffix:match[2]||""}:null;
+}
+
+function migrateLegacySupersets(rows){
+  const candidates=new Map();
+  rows.forEach(row=>{
+    if(supersetKey(row)||(row.mode||"sets")!=="sets")return;
+    const parsed=legacyExerciseNumber(row.exercise_no);
+    if(!parsed)return;
+    if(!candidates.has(parsed.base))candidates.set(parsed.base,[]);
+    candidates.get(parsed.base).push({row,suffix:parsed.suffix});
+  });
+  const used=new Set(rows.map(supersetKey).filter(Boolean));
+  let changed=false;
+  candidates.forEach((members,base)=>{
+    if(members.length<2||!members.some(member=>member.suffix))return;
+    let key=`legacy_${base}`,number=2;
+    while(used.has(key))key=`legacy_${base}_${number++}`;
+    used.add(key);
+    members.forEach(({row})=>{row.superset_key=key;changed=true});
+  });
+  return changed;
+}
+
+function exerciseUnits(rows){
+  const ordered=[...rows].sort((a,b)=>(Number(a.order_index)||0)-(Number(b.order_index)||0)||String(a.id).localeCompare(String(b.id)));
+  const grouped=new Map();
+  ordered.forEach(row=>{
+    const key=supersetKey(row);
+    if(key){
+      if(!grouped.has(key))grouped.set(key,[]);
+      grouped.get(key).push(row);
+    }
+  });
+  const seen=new Set(),units=[];
+  ordered.forEach(row=>{
+    const key=supersetKey(row);
+    if(!key){units.push([row]);return}
+    if(seen.has(key))return;
+    seen.add(key);
+    units.push(grouped.get(key)||[row]);
+  });
+  return units;
+}
+
+function normalizeExerciseRows(rows,{detectLegacy=false}={}){
+  const before=new Map(rows.map(row=>[row.id,JSON.stringify([row.order_index,row.exercise_no,row.superset_key,row.group_label])]));
+  const legacyMigrated=detectLegacy&&migrateLegacySupersets(rows);
+  const counts=new Map();
+  rows.forEach(row=>{const key=supersetKey(row);if(key)counts.set(key,(counts.get(key)||0)+1)});
+  rows.forEach(row=>{
+    const key=supersetKey(row);
+    if(key&&(counts.get(key)||0)<2){row.superset_key=null;row.group_label=null}
+    else if(key)row.superset_key=key;
+  });
+  const units=exerciseUnits(rows);
+  let order=0,supersetNo=0;
+  units.forEach((unit,unitIndex)=>{
+    const grouped=unit.length>1&&Boolean(supersetKey(unit[0]));
+    if(grouped)supersetNo++;
+    unit.forEach((row,memberIndex)=>{
+      order++;
+      row.order_index=order;
+      row.exercise_no=grouped?`${unitIndex+1}${supersetMemberCode(memberIndex)}`:String(unitIndex+1);
+      row.group_label=grouped?`Superseria ${supersetNo}`:null;
+    });
+  });
+  const changed=rows.some(row=>before.get(row.id)!==JSON.stringify([row.order_index,row.exercise_no,row.superset_key,row.group_label]));
+  return {rows:units.flat(),changed,legacyMigrated};
+}
+
+function syncProgressionOrderFromTraining(){
+  if(!STATE.progressionExercises.length)return false;
+  const rank=new Map();
+  let index=0;
+  [...STATE.trainings]
+    .sort((a,b)=>(Number(a.order_index)||0)-(Number(b.order_index)||0))
+    .forEach(training=>getTrainingRows(training.id).forEach(row=>rank.set(row.id,index++)));
+  let changed=false;
+  STATE.blocks.forEach(block=>{
+    const rows=STATE.progressionExercises
+      .filter(row=>row.block_id===block.id&&!row._delete)
+      .sort((a,b)=>{
+        const ar=rank.has(a.training_exercise_id)?rank.get(a.training_exercise_id):Number.MAX_SAFE_INTEGER;
+        const br=rank.has(b.training_exercise_id)?rank.get(b.training_exercise_id):Number.MAX_SAFE_INTEGER;
+        return ar-br||(Number(a.order_index)||0)-(Number(b.order_index)||0)||String(a.id).localeCompare(String(b.id));
+      });
+    rows.forEach((row,rowIndex)=>{
+      const next=rowIndex+1;
+      if(Number(row.order_index)!==next){row.order_index=next;changed=true}
+    });
+  });
+  return changed;
+}
+
+function normalizeTrainingStructure(trainingId,{detectLegacy=false,syncProgression=true}={}){
+  const result=normalizeExerciseRows(STATE.trainingExercises.filter(row=>row.training_id===trainingId),{detectLegacy});
+  if(syncProgression&&syncProgressionOrderFromTraining())result.changed=true;
+  return result;
+}
+
+function normalizeAllTrainingStructures({detectLegacy=false}={}){
+  let changed=false,legacyMigrated=false;
+  STATE.trainings.forEach(training=>{
+    const result=normalizeTrainingStructure(training.id,{detectLegacy,syncProgression:false});
+    changed=changed||result.changed;
+    legacyMigrated=legacyMigrated||result.legacyMigrated;
+  });
+  changed=syncProgressionOrderFromTraining()||changed;
+  return {changed,legacyMigrated};
+}
+
+function applyTrainingExerciseOrder(trainingId,orderedRows){
+  orderedRows.forEach((row,index)=>{row.order_index=index+1});
+  normalizeTrainingStructure(trainingId);
+  markDirty();
+  render();
+}
+
+function moveTrainingExercise(id,direction){
+  const row=STATE.trainingExercises.find(item=>item.id===id);
+  if(!row)return;
+  const rows=getTrainingRows(row.training_id),rowIndex=rows.findIndex(item=>item.id===id);
+  const neighborIndex=rowIndex+(direction<0?-1:1);
+  if(neighborIndex<0||neighborIndex>=rows.length)return;
+  const neighbor=rows[neighborIndex];
+  if(supersetKey(row)&&supersetKey(row)===supersetKey(neighbor)){
+    [rows[rowIndex],rows[neighborIndex]]=[rows[neighborIndex],rows[rowIndex]];
+    applyTrainingExerciseOrder(row.training_id,rows);
+    return;
+  }
+  const units=exerciseUnits(rows);
+  const sourceIndex=units.findIndex(unit=>unit.some(item=>item.id===id));
+  const targetIndex=sourceIndex+(direction<0?-1:1);
+  if(sourceIndex<0||targetIndex<0||targetIndex>=units.length)return;
+  [units[sourceIndex],units[targetIndex]]=[units[targetIndex],units[sourceIndex]];
+  applyTrainingExerciseOrder(row.training_id,units.flat());
+}
+
+function beginExerciseDrag(event,id){
+  STATE.draggedExerciseId=id;
+  event.dataTransfer.effectAllowed="move";
+  event.dataTransfer.setData("text/plain",id);
+  event.currentTarget.closest(".exerciseGrid")?.classList.add("dragging");
+}
+
+function showExerciseDropTarget(event){
+  if(!STATE.draggedExerciseId)return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect="move";
+  document.querySelectorAll(".exerciseGrid.dropBefore,.exerciseGrid.dropAfter").forEach(element=>element.classList.remove("dropBefore","dropAfter"));
+  const after=event.clientY>event.currentTarget.getBoundingClientRect().top+event.currentTarget.offsetHeight/2;
+  event.currentTarget.classList.add(after?"dropAfter":"dropBefore");
+}
+
+function finishExerciseDrag(){
+  STATE.draggedExerciseId=null;
+  document.querySelectorAll(".exerciseGrid.dragging,.exerciseGrid.dropBefore,.exerciseGrid.dropAfter").forEach(element=>element.classList.remove("dragging","dropBefore","dropAfter"));
+}
+
+function dropTrainingExercise(event,targetId){
+  event.preventDefault();
+  const draggedId=event.dataTransfer.getData("text/plain")||STATE.draggedExerciseId;
+  const after=event.currentTarget.classList.contains("dropAfter");
+  const dragged=STATE.trainingExercises.find(row=>row.id===draggedId);
+  const target=STATE.trainingExercises.find(row=>row.id===targetId);
+  finishExerciseDrag();
+  if(!dragged||!target||dragged.id===target.id||dragged.training_id!==target.training_id)return;
+  const rows=getTrainingRows(dragged.training_id);
+  if(supersetKey(dragged)&&supersetKey(dragged)===supersetKey(target)){
+    const reordered=rows.filter(row=>row.id!==dragged.id);
+    const targetIndex=reordered.findIndex(row=>row.id===target.id);
+    reordered.splice(targetIndex+(after?1:0),0,dragged);
+    applyTrainingExerciseOrder(dragged.training_id,reordered);
+    return;
+  }
+  const units=exerciseUnits(rows);
+  const sourceUnit=units.find(unit=>unit.some(row=>row.id===dragged.id));
+  const targetUnit=units.find(unit=>unit.some(row=>row.id===target.id));
+  if(!sourceUnit||!targetUnit||sourceUnit===targetUnit)return;
+  const reordered=units.filter(unit=>unit!==sourceUnit);
+  const targetIndex=reordered.indexOf(targetUnit);
+  reordered.splice(targetIndex+(after?1:0),0,sourceUnit);
+  applyTrainingExerciseOrder(dragged.training_id,reordered.flat());
 }
 
 function selectedSupersetRows(trainingId){
@@ -511,24 +730,23 @@ function selectedSupersetRows(trainingId){
 function supersetKeysForRows(rows){
   const keys=[];
   rows.forEach(row=>{
-    const key=String(row.superset_key||"").trim().toLowerCase();
+    const key=supersetKey(row);
     if(key&&!keys.includes(key))keys.push(key);
   });
   return keys;
 }
 
 function supersetDisplayLabel(row,rows){
-  if(row.group_label)return row.group_label;
-  const key=String(row.superset_key||"").trim().toLowerCase();
+  const key=supersetKey(row);
   const index=supersetKeysForRows(rows).indexOf(key);
   return `Superseria ${index>=0?index+1:1}`;
 }
 
 function supersetMemberLabel(row,rows){
-  const key=String(row.superset_key||"").trim().toLowerCase();
-  const grouped=rows.filter(item=>String(item.superset_key||"").trim().toLowerCase()===key);
+  const key=supersetKey(row);
+  const grouped=rows.filter(item=>supersetKey(item)===key);
   const index=grouped.findIndex(item=>item.id===row.id);
-  return String.fromCharCode(65+Math.max(0,index));
+  return supersetMemberCode(Math.max(0,index));
 }
 
 function toggleSupersetSelection(id,checked){
@@ -544,24 +762,17 @@ function clearSupersetSelection(trainingId){
 }
 
 function nextSupersetKey(rows){
-  const used=new Set(rows.map(row=>String(row.superset_key||"").trim().toLowerCase()).filter(Boolean));
+  const used=new Set(rows.map(supersetKey).filter(Boolean));
   let number=1;
   while(used.has(`ss${number}`))number++;
   return `ss${number}`;
-}
-
-function nextSupersetLabel(rows){
-  const used=new Set(rows.filter(row=>String(row.superset_key||"").trim()).map(row=>supersetDisplayLabel(row,rows)));
-  let number=1;
-  while(used.has(`Superseria ${number}`))number++;
-  return `Superseria ${number}`;
 }
 
 function connectSelectedSuperset(trainingId){
   const rows=getTrainingRows(trainingId),selected=selectedSupersetRows(trainingId);
   if(selected.length<2){showToast("Zaznacz co najmniej dwa ćwiczenia");return}
   if(selected.some(row=>(row.mode||"sets")!=="sets")){showToast("Superseria może zawierać tylko ćwiczenia typu sets");return}
-  if(selected.some(row=>String(row.superset_key||"").trim())){showToast("Najpierw rozłącz zaznaczone ćwiczenia");return}
+  if(selected.some(row=>supersetKey(row))){showToast("Najpierw rozłącz zaznaczone ćwiczenia");return}
   const selectedIds=new Set(selected.map(row=>row.id));
   const firstIndex=Math.min(...selected.map(row=>rows.findIndex(item=>item.id===row.id)));
   const selectedInOrder=rows.filter(row=>selectedIds.has(row.id));
@@ -569,8 +780,8 @@ function connectSelectedSuperset(trainingId){
   remaining.splice(firstIndex,0,...selectedInOrder);
   remaining.forEach((row,index)=>{row.order_index=index+1});
   const key=nextSupersetKey(rows);
-  const label=nextSupersetLabel(rows);
-  selectedInOrder.forEach(row=>{row.superset_key=key;row.group_label=label});
+  selectedInOrder.forEach(row=>{row.superset_key=key});
+  normalizeTrainingStructure(trainingId);
   clearSupersetSelection(trainingId);
   markDirty();
   showToast(`Połączono ${selectedInOrder.length} ćwiczenia`);
@@ -579,14 +790,15 @@ function connectSelectedSuperset(trainingId){
 
 function disconnectSelectedSuperset(trainingId){
   const rows=getTrainingRows(trainingId),selected=selectedSupersetRows(trainingId);
-  const keys=new Set(selected.map(row=>String(row.superset_key||"").trim().toLowerCase()).filter(Boolean));
+  const keys=new Set(selected.map(supersetKey).filter(Boolean));
   if(!keys.size){showToast("Zaznacz ćwiczenie należące do superserii");return}
   rows.forEach(row=>{
-    if(keys.has(String(row.superset_key||"").trim().toLowerCase())){
+    if(keys.has(supersetKey(row))){
       row.superset_key=null;
       row.group_label=null;
     }
   });
+  normalizeTrainingStructure(trainingId);
   clearSupersetSelection(trainingId);
   markDirty();
   showToast(keys.size===1?"Superseria rozłączona":"Superserie rozłączone");
@@ -1144,10 +1356,10 @@ function structureHTML(){
 function trainingHTML(t){
   const rows=getTrainingRows(t.id);
   const selected=selectedSupersetRows(t.id);
-  const selectedGroups=new Set(selected.map(row=>String(row.superset_key||"").trim().toLowerCase()).filter(Boolean));
+  const selectedGroups=new Set(selected.map(supersetKey).filter(Boolean));
   return `<div class="training">
     <div class="trainingHead"><div class="trainingIdentity"><input class="trainingNameInput" value="${esc(t.name)}" oninput="updateTraining('${t.id}','name',this.value)"><input class="trainingFocusInput" placeholder="Klatka · plecy · barki" value="${esc(t.focus||"")}" oninput="updateTraining('${t.id}','focus',this.value)"></div><div class="supersetActions"><button class="miniBtn good" onclick="connectSelectedSuperset('${t.id}')" ${selected.length<2?"disabled":""}>Połącz w superserię</button><button class="miniBtn" onclick="disconnectSelectedSuperset('${t.id}')" ${!selectedGroups.size?"disabled":""}>Rozłącz</button></div><div class="trainingCount">${rows.length} ćwiczeń</div><button class="deleteX trainingDelete" title="Usuń trening" onclick="deleteTraining('${t.id}')">×</button></div>
-    <div class="exerciseGrid header"><div>Nr</div><div>Ćwiczenie</div><div>Serie</div><div>Powt.</div><div>Przerwa</div><div>Ciężar</div><div>Tempo</div><div>Progresja</div><div>Typ</div><div>Superseria</div><div></div></div>
+    <div class="exerciseGrid header"><div>Kolejność</div><div>Ćwiczenie</div><div>Serie</div><div>Powt.</div><div>Przerwa</div><div>Ciężar</div><div>Tempo</div><div>Progresja</div><div>Typ</div><div>Superseria</div><div></div></div>
     ${rows.map((row,index)=>exerciseRowHTML(row,index,rows)).join("")||`<div class="empty" style="margin:12px">Brak ćwiczeń</div>`}
     ${addExerciseHTML(t.id)}
   </div>`;
@@ -1157,14 +1369,14 @@ function exerciseRowHTML(row,index,rows){
   const ex=row.exercises||STATE.exercises.find(e=>e.id===row.exercise_id)||{};
   const rawPMode=row.progression_mode||(row.use_wg?"prescribed_weight":"none");
   const pMode=rawPMode==="manual_weight"?"prescribed_weight":rawPMode;
-  const key=String(row.superset_key||"").trim().toLowerCase();
-  const previousKey=String(rows[index-1]?.superset_key||"").trim().toLowerCase();
-  const nextKey=String(rows[index+1]?.superset_key||"").trim().toLowerCase();
+  const key=supersetKey(row);
+  const previousKey=supersetKey(rows[index-1]);
+  const nextKey=supersetKey(rows[index+1]);
   const groupLabel=key?supersetDisplayLabel(row,rows):"";
   const memberLabel=key?supersetMemberLabel(row,rows):"";
   const selected=!!STATE.supersetSelection?.[row.id];
-  return `<div class="exerciseGrid ${key?"supersetRow":""} ${key&&key!==previousKey?"supersetStart":""} ${key&&key!==nextKey?"supersetEnd":""}" data-training-exercise-id="${esc(row.id)}" data-exercise-no="${esc(row.exercise_no||"")}">
-    <input class="exerciseNoInput ${row.superset_key?"supersetNo":""}" value="${esc(row.exercise_no||"")}" oninput="updateTrainingExercise('${row.id}','exercise_no',this.value)">
+  return `<div class="exerciseGrid ${key?"supersetRow":""} ${key&&key!==previousKey?"supersetStart":""} ${key&&key!==nextKey?"supersetEnd":""}" data-training-exercise-id="${esc(row.id)}" data-exercise-no="${esc(row.exercise_no||"")}" ondragover="showExerciseDropTarget(event)" ondrop="dropTrainingExercise(event,'${row.id}')">
+    <div class="exerciseOrderCell"><button class="exerciseDragHandle" type="button" draggable="true" title="Przeciągnij, aby zmienić kolejność" aria-label="Przeciągnij ćwiczenie ${esc(row.exercise_no||index+1)}" ondragstart="beginExerciseDrag(event,'${row.id}')" ondragend="finishExerciseDrag()">⠿</button><span class="exerciseNoBadge ${key?"supersetNo":""}" title="Numer wynika z kolejności">${esc(row.exercise_no||index+1)}</span><span class="exerciseMoveButtons"><button class="exerciseMoveButton" type="button" title="Przesuń wyżej" aria-label="Przesuń wyżej" onclick="moveTrainingExercise('${row.id}',-1)" ${index===0?"disabled":""}>▲</button><button class="exerciseMoveButton" type="button" title="Przesuń niżej" aria-label="Przesuń niżej" onclick="moveTrainingExercise('${row.id}',1)" ${index===rows.length-1?"disabled":""}>▼</button></span></div>
     <div><div class="exerciseName">${esc(ex.name||row.source_name||"Ćwiczenie")}${key?` <span class="supersetLabel">· ${esc(groupLabel)} · ${memberLabel}</span>`:""}</div><input class="exerciseNoteInput" placeholder="Uwagi trenera" value="${esc(row.notes||"")}" oninput="updateTrainingExercise('${row.id}','notes',this.value)"></div>
     <input value="${esc(row.sets_text||"")}" oninput="updateTrainingExercise('${row.id}','sets_text',this.value)">
     <input value="${esc(row.reps_text||"")}" oninput="updateTrainingExercise('${row.id}','reps_text',this.value)">
@@ -1288,6 +1500,50 @@ function resourceRowHTML(r){
   return `<div class="resourceRow"><input value="${esc(r.label)}" oninput="updateResource('${r.id}','label',this.value)"><input value="${esc(r.url||"")}" oninput="updateResource('${r.id}','url',this.value)"><select onchange="updateResource('${r.id}','resource_type',this.value)"><option value="video" ${r.resource_type==="video"?"selected":""}>video</option><option value="note" ${r.resource_type==="note"?"selected":""}>note</option><option value="tempo" ${r.resource_type==="tempo"?"selected":""}>tempo</option><option value="rpe" ${r.resource_type==="rpe"?"selected":""}>rpe</option><option value="other" ${r.resource_type==="other"?"selected":""}>other</option></select><input value="${esc(r.notes||"")}" oninput="updateResource('${r.id}','notes',this.value)"><button class="deleteX" onclick="deleteResource('${r.id}')">×</button></div>`;
 }
 
+async function upsertTrainingExercisesWithStableOrder(payload){
+  if(!payload.length)return;
+  const ids=payload.map(row=>row.id);
+  const {data:currentRows,error:readError}=await sb.from("training_exercises").select("id,order_index").in("id",ids);
+  if(readError)throw readError;
+  const previousOrder=new Map((currentRows||[]).map(row=>[row.id,Number(row.order_index)]));
+  const orderingPayload=payload.map(row=>({
+    id:row.id,
+    training_id:row.training_id,
+    exercise_id:row.exercise_id,
+    order_index:1_000_000_000+Number(row.order_index)
+  }));
+  let result=await sb.from("training_exercises").upsert(orderingPayload,{onConflict:"id"});
+  if(result.error)throw result.error;
+  result=await sb.from("training_exercises").upsert(payload,{onConflict:"id"});
+  if(result.error){
+    const restorePayload=payload
+      .filter(row=>previousOrder.has(row.id))
+      .map(row=>({
+        id:row.id,
+        training_id:row.training_id,
+        exercise_id:row.exercise_id,
+        order_index:previousOrder.get(row.id)
+      }));
+    if(restorePayload.length)await sb.from("training_exercises").upsert(restorePayload,{onConflict:"id"});
+    throw result.error;
+  }
+}
+
+async function persistTrainingStructure(trainingId){
+  const rows=getTrainingRows(trainingId);
+  if(!rows.length)return;
+  const payload=rows.map(row=>({
+    id:row.id,
+    training_id:row.training_id,
+    exercise_id:row.exercise_id,
+    order_index:Number(row.order_index),
+    exercise_no:row.exercise_no,
+    superset_key:row.superset_key||null,
+    group_label:row.group_label||null
+  }));
+  await upsertTrainingExercisesWithStableOrder(payload);
+}
+
 
 async function createTraining(){
   const currentPlan=getCurrentPlan();
@@ -1321,16 +1577,25 @@ async function addExerciseToTraining(trainingId){
       exerciseId=existing.id;
     }
     const ex=STATE.exercises.find(e=>e.id===exerciseId);
-    const rows=STATE.trainingExercises.filter(r=>r.training_id===trainingId);
+    const rows=getTrainingRows(trainingId);
     const order=rows.reduce((m,r)=>Math.max(m,Number(r.order_index)||0),0)+1;
-    const no=String(rows.reduce((m,r)=>Math.max(m,parseInt(String(r.exercise_no||r.order_index||"0").match(/\d+/)?.[0]||"0",10)),0)+1);
+    const no=String(exerciseUnits(rows).length+1);
     const {error}=await sb.from("training_exercises").insert({training_id:trainingId,exercise_id:exerciseId,exercise_no:no,order_index:order,sets_text:"",reps_text:"",rest_text:"",load_text:null,tempo_text:null,progression_mode:"none",use_wg:false,mode:ex?.default_mode||"sets",notes:null,progression_raw:{}});
     if(error)throw error;await loadPlan(getCurrentPlan().id);
   }catch(err){setError(err);}
 }
 async function deleteTrainingExercise(id){
   if(!confirm("Usunąć ćwiczenie z treningu?"))return;
-  try{const {error}=await sb.from("training_exercises").delete().eq("id",id);if(error)throw error;await loadPlan(getCurrentPlan().id);}catch(err){setError(err);}
+  const row=STATE.trainingExercises.find(item=>item.id===id);
+  if(!row)return;
+  try{
+    const {error}=await sb.from("training_exercises").delete().eq("id",id);
+    if(error)throw error;
+    STATE.trainingExercises=STATE.trainingExercises.filter(item=>item.id!==id);
+    normalizeTrainingStructure(row.training_id);
+    await persistTrainingStructure(row.training_id);
+    await loadPlan(getCurrentPlan().id);
+  }catch(err){setError(err);}
 }
 
 async function ensureProgressionBlock(){
@@ -1924,8 +2189,8 @@ function clientExercisePreviewHTML(preview,row,week,rows,index){
   const ex=row.exercises||{};
   const rx=progressionPreviewFor(preview,row,week);
   const base=[row.sets_text,row.reps_text,row.rest_text].filter(Boolean).join(" · ");
-  const key=String(row.superset_key||"").trim().toLowerCase();
-  const member=key?String.fromCharCode(65+rows.filter((item,rowIndex)=>rowIndex<=index&&String(item.superset_key||"").trim().toLowerCase()===key).length-1):"";
+  const key=supersetKey(row);
+  const member=key?supersetMemberCode(rows.filter((item,rowIndex)=>rowIndex<=index&&supersetKey(item)===key).length-1):"";
   return `<div class="clientExercise">
     <div><strong>${esc(row.exercise_no||"")} ${esc(ex.name||row.source_name||"Ćwiczenie")}</strong>${key?` <span class="pill good">Superseria · ${member}</span>`:""}</div>
     <div class="small">${esc(base||row.notes||"")}</div>
@@ -2004,6 +2269,7 @@ async function loadAthletePreview(athleteId,planId){
     if(trainingIds.length){
       const te=await sb.from("training_exercises").select("id,training_id,exercise_id,exercise_no,order_index,sets_text,reps_text,rest_text,weight,load_text,tempo_text,use_wg,progression_mode,superset_key,mode,notes,exercises(id,name,youtube_url)").in("training_id",trainingIds).order("order_index");
       if(te.error)throw te.error;trainingExercises=te.data||[];
+      trainings.forEach(training=>normalizeExerciseRows(trainingExercises.filter(row=>row.training_id===training.id),{detectLegacy:true}));
     }
     const blockIds=(blocks.data||[]).map(b=>b.id);
     let progressionExercises=[],progressionSets=[],weekNotes=[];
@@ -2077,6 +2343,7 @@ async function deleteExercise(id){
 async function savePlan(){
   const currentPlan=getCurrentPlan();
   if(!currentPlan)return;
+  normalizeAllTrainingStructures({detectLegacy:true});
   STATE.saving=true;setStatus("Zapisuję plan...","loading");render();
   try{
     const p=currentPlan;
@@ -2086,9 +2353,24 @@ async function savePlan(){
       res=await sb.from("trainings").update({name:t.name,focus:t.focus||null,order_index:Number(t.order_index)}).eq("id",t.id);
       if(res.error)throw res.error;
     }
-    for(const r of STATE.trainingExercises){
+    const trainingExercisePayload=STATE.trainingExercises.map(r=>{
       const pMode=r.progression_mode==="manual_weight"?"prescribed_weight":(r.progression_mode||"none");
-      res=await sb.from("training_exercises").update({exercise_no:r.exercise_no||null,sets_text:r.sets_text||null,reps_text:r.reps_text||null,rest_text:r.rest_text||null,weight:pMode==="prescribed_weight"?null:nullableNumber(r.weight),load_text:r.load_text||null,tempo_text:r.tempo_text||null,use_wg:pMode==="prescribed_weight",progression_mode:pMode,superset_key:r.superset_key||null,group_label:r.group_label||null,mode:r.mode||"sets",notes:r.notes||null,video_hint:r.video_hint||null}).eq("id",r.id);
+      return {id:r.id,training_id:r.training_id,exercise_id:r.exercise_id,exercise_no:r.exercise_no||null,order_index:Number(r.order_index),sets_text:r.sets_text||null,reps_text:r.reps_text||null,rest_text:r.rest_text||null,weight:pMode==="prescribed_weight"?null:nullableNumber(r.weight),load_text:r.load_text||null,tempo_text:r.tempo_text||null,use_wg:pMode==="prescribed_weight",progression_mode:pMode,superset_key:r.superset_key||null,group_label:r.group_label||null,mode:r.mode||"sets",notes:r.notes||null,video_hint:r.video_hint||null};
+    });
+    if(trainingExercisePayload.length){
+      await upsertTrainingExercisesWithStableOrder(trainingExercisePayload);
+    }
+    const progressionExercisePayload=STATE.progressionExercises.filter(row=>!row._delete&&!isTempId(row.id)).map(row=>({
+      id:row.id,
+      block_id:row.block_id,
+      exercise_id:row.exercise_id,
+      training_exercise_id:row.training_exercise_id||null,
+      order_index:Number(row.order_index)||1,
+      notes:row.notes||null,
+      source_name:row.source_name||null
+    }));
+    if(progressionExercisePayload.length){
+      res=await sb.from("progression_exercises").upsert(progressionExercisePayload,{onConflict:"id"});
       if(res.error)throw res.error;
     }
     for(const r of STATE.resources){
