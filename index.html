@@ -1578,6 +1578,11 @@ async function addExerciseToTraining(trainingId){
     }
     const ex=STATE.exercises.find(e=>e.id===exerciseId);
     const rows=getTrainingRows(trainingId);
+    const duplicate=rows.find(row=>row.exercise_id===exerciseId);
+    if(duplicate){
+      showToast(`${ex?.name||"To ćwiczenie"} jest już w tym treningu`);
+      return;
+    }
     const order=rows.reduce((m,r)=>Math.max(m,Number(r.order_index)||0),0)+1;
     const no=String(exerciseUnits(rows).length+1);
     const {error}=await sb.from("training_exercises").insert({training_id:trainingId,exercise_id:exerciseId,exercise_no:no,order_index:order,sets_text:"",reps_text:"",rest_text:"",load_text:null,tempo_text:null,progression_mode:"none",use_wg:false,mode:ex?.default_mode||"sets",notes:null,progression_raw:{}});
