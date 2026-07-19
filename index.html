@@ -278,6 +278,8 @@ input:disabled{background:var(--card-alt);color:var(--muted)}
 .dataTable th,.dataTable td,.setLogTable th,.setLogTable td{padding:10px 13px;border:0;border-bottom:1px solid var(--row-line);text-align:left;vertical-align:middle}
 .dataTable th,.setLogTable th{position:static;background:var(--card-alt);color:var(--faint);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .dataTable tbody tr:hover{background:#f7f9f7}
+.sessionHistoryRow{cursor:pointer}
+.sessionHistoryRow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .sessionRowActive{background:#f3f7f4}
 .rowSelect{padding:0;border:0;background:transparent;color:var(--ink);font:inherit;cursor:pointer}
 .sessionDetailsPanel{padding:15px;overflow:visible}
@@ -844,6 +846,18 @@ function athletePlanLinks(athleteId){
 
 function activeAthletePlan(athleteId){
   return getAthleteLinks(athleteId).find(x=>(x.plans||{}).status==="active")||getAthleteLinks(athleteId)[0]||null;
+}
+
+function workoutSessionDate(session){
+  return String(session?.performed_date||session?.workout_date||"");
+}
+
+function sortWorkoutSessions(sessions){
+  return [...(sessions||[])].sort((a,b)=>
+    workoutSessionDate(b).localeCompare(workoutSessionDate(a))||
+    String(b.recorded_at||"").localeCompare(String(a.recorded_at||""))||
+    String(b.id||"").localeCompare(String(a.id||""))
+  );
 }
 
 function blockWeeks(block){
@@ -2026,11 +2040,11 @@ function athleteSummaryHTML(a){
   const current=preview?.athleteId===a.id?preview:null;
   const sessions=current?.workoutSessions||[];
   const setLogs=current?.workoutSetLogs||[];
-  const latestSession=[...sessions].sort((x,y)=>String(y.workout_date||"").localeCompare(String(x.workout_date||"")))[0];
+  const latestSession=sortWorkoutSessions(sessions)[0];
   const active=activeAthletePlan(a.id);
   const plan=current?.plan||active?.plans||STATE.plans.find(p=>p.id===active?.plan_id);
   return `<div class="metricStrip">
-    <div class="metricCard"><div class="metricLabel">Treningi</div><div class="metricValue">${sessions.length}</div><div class="small">${latestSession?`ostatni ${esc(shortDate(latestSession.workout_date))}`:"załaduj historię"}</div></div>
+    <div class="metricCard"><div class="metricLabel">Treningi</div><div class="metricValue">${sessions.length}</div><div class="small">${latestSession?`ostatni ${esc(shortDate(workoutSessionDate(latestSession)))}`:"załaduj historię"}</div></div>
     <div class="metricCard"><div class="metricLabel">Serie</div><div class="metricValue">${setLogs.filter(l=>l.done).length}</div><div class="small">wykonane</div></div>
     <div class="metricCard"><div class="metricLabel">Śr. RPE</div><div class="metricValue">${avgRpe(setLogs)}</div><div class="small">z zapisanych serii</div></div>
     <div class="metricCard"><div class="metricLabel">Aktywny plan</div><div class="metricValue metricPlan">${esc(plan?.name||"Brak")}</div><div class="small">${plan?`${esc(plan.weeks||"-")} tygodni`:"nieprzypisany"}</div></div>
@@ -2075,7 +2089,7 @@ function athleteMeasurementsHTML(a){
 }
 
 function workoutHistoryHTML(preview){
-  const sessions=[...(preview.workoutSessions||[])].sort((a,b)=>String(b.workout_date||"").localeCompare(String(a.workout_date||""))||String(b.workout_id||"").localeCompare(String(a.workout_id||"")));
+  const sessions=sortWorkoutSessions(preview.workoutSessions);
   if(!sessions.length)return `<div class="historyPanel"><div class="historyTitle">Wykonane treningi</div><div class="empty">Brak zapisanych treningów dla tego planu.</div></div>`;
   const selectedId=STATE.selectedWorkoutSessionId&&sessions.some(s=>s.id===STATE.selectedWorkoutSessionId)?STATE.selectedWorkoutSessionId:sessions[0].id;
   return `<div class="historyGrid">
@@ -2096,8 +2110,10 @@ function sessionHistoryRowHTML(preview,s,selectedId){
   const logs=workoutLogsForSession(preview,s.id);
   const doneSets=logs.filter(l=>l.done).length;
   const state=sessionStatusMeta(s.status);
-  return `<tr class="${s.id===selectedId?"sessionRowActive":""}">
-    <td><button class="rowSelect" onclick="selectWorkoutSession('${s.id}')">${esc(humanDate(s.performed_date||s.workout_date))}</button></td>
+  const selected=s.id===selectedId;
+  const label=`${s.workout_name||s.workout_id||s.session_id||"Trening"}, ${humanDate(workoutSessionDate(s))}`;
+  return `<tr class="sessionHistoryRow ${selected?"sessionRowActive":""}" tabindex="0" aria-selected="${selected}" aria-label="Pokaż szczegóły: ${esc(label)}" onclick="selectWorkoutSession('${s.id}')" onkeydown="if(event.target===event.currentTarget&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectWorkoutSession('${s.id}')}">
+    <td><button type="button" class="rowSelect">${esc(humanDate(workoutSessionDate(s)))}</button></td>
     <td>${esc(s.week_number||"-")}</td>
     <td><strong>${esc(s.workout_name||s.workout_id||s.session_id)}</strong></td>
     <td><span class="pill ${state.className}">${esc(state.label)}</span></td>
@@ -2308,7 +2324,7 @@ async function loadAthletePreview(athleteId,planId){
       workoutSetLogs=logs.data||[];
     }
     STATE.selectedAthleteId=athleteId;
-    STATE.selectedWorkoutSessionId=workoutSessions[0]?.id||null;
+    STATE.selectedWorkoutSessionId=sortWorkoutSessions(workoutSessions)[0]?.id||null;
     STATE.previewWeek=1;
     STATE.athletePreview={athleteId,plan,trainings,trainingExercises,blocks:blocks.data||[],progressionExercises,progressionSets,weekNotes,workoutSessions,workoutSetLogs,measurements};
     setStatus("Podgląd klienta załadowany","ok");
