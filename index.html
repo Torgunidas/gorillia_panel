@@ -962,8 +962,17 @@ function setPreviewWeek(week){
   render();
 }
 
-function setAthleteTab(tab){
+async function setAthleteTab(tab){
   STATE.athleteTab=tab;
+  const athlete=STATE.athletes.find(a=>a.id===STATE.selectedAthleteId);
+  const previewTabs=["history","measurements","preview"];
+  if(previewTabs.includes(tab)&&athlete&&STATE.athletePreview?.athleteId!==athlete.id){
+    const link=activeAthletePlan(athlete.id);
+    if(link?.plan_id){
+      await loadAthletePreview(athlete.id,link.plan_id);
+      return;
+    }
+  }
   render();
 }
 
